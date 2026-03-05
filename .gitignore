@@ -1,0 +1,60 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# ================================
+# Backend Node.js
+# ================================
+projet_awi/backend/node_modules/
+projet_awi/frontend/node_modules/
+
+
+# Certificats SSL (ne jamais versionner des clés privées)
+projet_awi/backend/certs/*.pem
+projet_awi/backend/certs/*.key
+projet_awi/backend/certs/*.crt
+
+# Base de données SQLite locale
+*.sqlite
+*.sqlite3
+*.db
+
+# Backups de base de données
+*.sql
+*.tar.gz
+projet_awi/db_backup.tar.gz
+projet_awi/backup.sql
+
+# Logs de build
+projet_awi/build-debug.log
+*.log
+
+# Cookies de test curl
+cookies.txt
+projet_awi/cookies.txt
+projet_awi/backend/cookies.txt
+
+# Dossiers de build frontend/backend
+projet_awi/backend/dist/
+projet_awi/frontend/dist/
+projet_awi/frontend/.next/
+projet_awi/frontend/build/
+
+# Android keystore (clés de signature de l'APK)
+*.jks
+*.keystore
+
+# Android build outputs
+app/build/
