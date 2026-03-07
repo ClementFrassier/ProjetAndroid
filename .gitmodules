@@ -1,0 +1,3 @@
+[submodule "projet_awi"]
+	path = projet_awi
+	url = https://github.com/Rasim663469/workflow-management-app.git
