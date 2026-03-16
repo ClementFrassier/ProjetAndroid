@@ -31,6 +31,7 @@ object Routes {
     const val LOGIN = "login"
     const val FESTIVALS = "festivals"
     const val FESTIVAL_DETAIL = "festivals/{festivalId}"
+    const val FESTIVAL_CREATE = "festival_create"
     const val RESERVATIONS = "reservations/{festivalId}"
     const val RESERVATION_DETAIL = "reservations/{festivalId}/detail/{reservationId}"
     const val RESERVATION_CREATE = "reservations/{festivalId}/create"
@@ -117,6 +118,9 @@ fun AppNavigation(application: AwiApplication) {
                 },
                 onNavigateToGames = {
                     navController.navigate(Routes.GAMES)
+                },
+                onNavigateToCreateFestival = {
+                    navController.navigate(Routes.FESTIVAL_CREATE)
                 }
             )
         }
@@ -135,6 +139,16 @@ fun AppNavigation(application: AwiApplication) {
                 },
                 onViewInvoices = { id ->
                     navController.navigate(Routes.invoices(id))
+                }
+            )
+        }
+
+        composable(Routes.FESTIVAL_CREATE) {
+            com.example.myapplication.ui.festival.CreateFestivalScreen(
+                viewModel = festivalViewModel,
+                onBack = { navController.popBackStack() },
+                onSuccess = {
+                    navController.popBackStack()
                 }
             )
         }

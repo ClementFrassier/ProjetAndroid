@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,7 +31,8 @@ fun FestivalListScreen(
     onLogout: () -> Unit,
     onLogin: () -> Unit,
     onNavigateToEditors: () -> Unit = {},
-    onNavigateToGames: () -> Unit = {}
+    onNavigateToGames: () -> Unit = {},
+    onNavigateToCreateFestival: () -> Unit = {}
 ) {
     val state by festivalViewModel.listState.collectAsState()
     val authState by authViewModel.uiState.collectAsState()
@@ -78,6 +80,13 @@ fun FestivalListScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             )
+        },
+        floatingActionButton = {
+            if (authState.isLoggedIn) {
+                FloatingActionButton(onClick = onNavigateToCreateFestival) {
+                    Icon(Icons.Default.Add, contentDescription = "Créer un festival")
+                }
+            }
         }
     ) { padding ->
         Box(

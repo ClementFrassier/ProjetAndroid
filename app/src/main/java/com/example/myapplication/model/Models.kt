@@ -43,6 +43,15 @@ data class Festival(
     val editeurs: List<EditeurLight>
 )
 
+data class CreateFestivalRequest(
+    @SerializedName("nom") val nom: String,
+    val location: String,
+    @SerializedName("date_debut") val dateDebut: String,
+    @SerializedName("date_fin") val dateFin: String,
+    val description: String?,
+    @SerializedName("nombre_total_tables") val nombreTotalTables: Int
+)
+
 data class EditeurLight(
     val id: Int,
     val name: String

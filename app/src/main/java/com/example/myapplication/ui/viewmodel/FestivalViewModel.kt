@@ -74,6 +74,25 @@ class FestivalViewModel(private val repository: FestivalRepository) : ViewModel(
         }
     }
 
+    fun createFestival(request: com.example.myapplication.model.CreateFestivalRequest, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _listState.value = _listState.value.copy(isLoading = true, errorMessage = null)
+            when (val result = repository.createFestival(request)) {
+                is Result.Success -> {
+                    _listState.value = _listState.value.copy(isLoading = false)
+                    loadFestivals() // Rafraîchir la liste
+                    onSuccess()
+                }
+                is Result.Error -> {
+                    _listState.value = _listState.value.copy(
+                        isLoading = false,
+                        errorMessage = result.message
+                    )
+                }
+            }
+        }
+    }
+
     class Factory(private val repository: FestivalRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")

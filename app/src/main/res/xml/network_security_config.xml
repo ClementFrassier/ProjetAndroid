@@ -3,6 +3,7 @@
     <!-- Dev uniquement : accepte le certificat auto-signé du backend AWI sur l'émulateur -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">10.12.140.141</domain>
         <trust-anchors>
             <certificates src="system" />
             <certificates src="user" />

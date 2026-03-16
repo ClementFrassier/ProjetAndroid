@@ -46,4 +46,19 @@ class FestivalRepository(private val api: ApiService) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
         }
     }
+
+    suspend fun createFestival(request: com.example.myapplication.model.CreateFestivalRequest): Result<Festival> {
+        return try {
+            val response = api.createFestival(request)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) Result.Success(body)
+                else Result.Error("Festival créé mais retour vide")
+            } else {
+                Result.Error("Erreur ${response.code()} : ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
+        }
+    }
 }

@@ -14,7 +14,8 @@ import javax.net.ssl.X509TrustManager
 object ApiClient {
 
     // L'émulateur Android utilise 10.0.2.2 pour accéder à localhost du PC
-    private const val BASE_URL = "https://10.0.2.2:4000/"
+    // Sur téléphone physique connecté au réseau local (Wi-Fi), il faut utiliser l'IP locale du PC
+    private const val BASE_URL = "https://10.12.140.141:4000/"
 
     private fun getUnsafeTrustManager(): X509TrustManager {
         return object : X509TrustManager {
