@@ -1,15 +1,14 @@
 package com.example.myapplication.data
 
-import com.example.myapplication.model.Reservation
-import com.example.myapplication.model.ReservationCreateInput
-import com.example.myapplication.model.ReservationUpdateInput
+import com.example.myapplication.model.Invoice
+import com.example.myapplication.model.InvoiceCreateInput
 import com.example.myapplication.network.ApiService
 
-class ReservationRepository(private val api: ApiService) {
+class InvoiceRepository(private val api: ApiService) {
 
-    suspend fun getReservationsByFestival(festivalId: Int): Result<List<Reservation>> {
+    suspend fun getInvoices(festivalId: Int? = null, editorId: Int? = null, isPaid: Boolean? = null): Result<List<Invoice>> {
         return try {
-            val response = api.getReservationsByFestival(festivalId)
+            val response = api.getInvoices(festivalId, editorId, isPaid)
             if (response.isSuccessful) {
                 Result.Success(response.body() ?: emptyList())
             } else {
@@ -20,13 +19,13 @@ class ReservationRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun getReservation(id: Int): Result<Reservation> {
+    suspend fun getInvoiceById(id: Int): Result<Invoice> {
         return try {
-            val response = api.getReservation(id)
+            val response = api.getInvoiceById(id)
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) Result.Success(body)
-                else Result.Error("Réservation introuvable")
+                else Result.Error("Facture introuvable")
             } else {
                 Result.Error("Erreur ${response.code()} : ${response.message()}")
             }
@@ -35,9 +34,9 @@ class ReservationRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun createReservation(reservation: ReservationCreateInput): Result<Reservation> {
+    suspend fun createInvoice(invoice: InvoiceCreateInput): Result<Invoice> {
         return try {
-            val response = api.createReservation(reservation)
+            val response = api.createInvoice(invoice)
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) Result.Success(body)
@@ -50,9 +49,9 @@ class ReservationRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun updateReservation(id: Int, reservation: ReservationUpdateInput): Result<Reservation> {
+    suspend fun markInvoiceAsPaid(id: Int): Result<Invoice> {
         return try {
-            val response = api.updateReservation(id, reservation)
+            val response = api.markInvoiceAsPaid(id)
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) Result.Success(body)
@@ -65,9 +64,9 @@ class ReservationRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun deleteReservation(id: Int): Result<Unit> {
+    suspend fun deleteInvoice(id: Int): Result<Unit> {
         return try {
-            val response = api.deleteReservation(id)
+            val response = api.deleteInvoice(id)
             if (response.isSuccessful) {
                 Result.Success(Unit)
             } else {

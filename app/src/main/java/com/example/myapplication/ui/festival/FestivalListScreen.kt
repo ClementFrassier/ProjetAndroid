@@ -8,6 +8,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +28,9 @@ fun FestivalListScreen(
     authViewModel: AuthViewModel,
     onFestivalClick: (Int) -> Unit,
     onLogout: () -> Unit,
-    onLogin: () -> Unit
+    onLogin: () -> Unit,
+    onNavigateToEditors: () -> Unit = {},
+    onNavigateToGames: () -> Unit = {}
 ) {
     val state by festivalViewModel.listState.collectAsState()
     val authState by authViewModel.uiState.collectAsState()
@@ -52,6 +56,12 @@ fun FestivalListScreen(
                 },
                 actions = {
                     if (authState.isLoggedIn) {
+                        IconButton(onClick = onNavigateToGames) {
+                            Icon(Icons.Filled.Casino, contentDescription = "Jeux")
+                        }
+                        IconButton(onClick = onNavigateToEditors) {
+                            Icon(Icons.Filled.Business, contentDescription = "Éditeurs")
+                        }
                         IconButton(onClick = {
                             authViewModel.logout()
                             onLogout()

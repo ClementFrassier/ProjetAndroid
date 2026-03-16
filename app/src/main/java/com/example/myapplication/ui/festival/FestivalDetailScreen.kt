@@ -22,7 +22,8 @@ fun FestivalDetailScreen(
     festivalId: Int,
     viewModel: FestivalViewModel,
     onBack: () -> Unit,
-    onViewReservations: (Int) -> Unit
+    onViewReservations: (Int) -> Unit,
+    onViewInvoices: (Int) -> Unit
 ) {
     val state by viewModel.detailState.collectAsState()
 
@@ -128,13 +129,23 @@ fun FestivalDetailScreen(
                         }
 
                         item {
-                            Button(
-                                onClick = { onViewReservations(festival.id) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp)
-                            ) {
-                                Text("Voir les réservations")
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = { onViewReservations(festival.id) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(50.dp)
+                                ) {
+                                    Text("Voir les réservations")
+                                }
+                                OutlinedButton(
+                                    onClick = { onViewInvoices(festival.id) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(50.dp)
+                                ) {
+                                    Text("Voir les factures")
+                                }
                             }
                         }
                     }

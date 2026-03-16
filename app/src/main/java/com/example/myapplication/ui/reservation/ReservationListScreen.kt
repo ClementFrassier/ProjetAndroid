@@ -5,6 +5,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +22,8 @@ import com.example.myapplication.ui.viewmodel.ReservationViewModel
 fun ReservationListScreen(
     festivalId: Int,
     viewModel: ReservationViewModel,
+    onReservationClick: (Int) -> Unit,
+    onCreateReservation: () -> Unit,
     onBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -41,6 +45,11 @@ fun ReservationListScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onCreateReservation) {
+                Icon(Icons.Filled.Add, contentDescription = "Créer une réservation")
+            }
         }
     ) { padding ->
         Box(
@@ -84,7 +93,10 @@ fun ReservationListScreen(
                             )
                         }
                         items(state.reservations) { reservation ->
-                            ReservationCard(reservation)
+                            ReservationCard(
+                                reservation = reservation, 
+                                onClick = { onReservationClick(reservation.id) }
+                            )
                         }
                     }
                 }
@@ -94,17 +106,17 @@ fun ReservationListScreen(
 }
 
 @Composable
-private fun ReservationCard(reservation: Reservation) {
-    val statusColor = when (reservation.statutWorkflow) {
-        "present" -> MaterialTheme.colorScheme.primary
-        "facture" -> MaterialTheme.colorScheme.tertiary
-        "facture_payee" -> MaterialTheme.colorScheme.secondary
-        "annulée" -> MaterialTheme.colorScheme.error
+private fun ReservationCard(reservation: Reservation, onClick: () -> Unit) {
+    val statusColor = when (reservation.workflowState) {
+        "PRESENT" -> MaterialTheme.colorScheme.primary
+        "FACTURE" -> MaterialTheme.colorScheme.tertiary
+        "FACTURE_PAYEE" -> MaterialTheme.colorScheme.secondary
+        "ANNULÉE" -> MaterialTheme.colorScheme.error
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(3.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -114,14 +126,14 @@ private fun ReservationCard(reservation: Reservation) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    reservation.editeurNom ?: "Éditeur #${reservation.editeurId}",
+                    reservation.editor?.name ?: "Éditeur ou Réservant #${reservation.editorId ?: reservation.reservantId}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Badge(containerColor = statusColor) {
                     Text(
-                        reservation.statutWorkflow ?: "—",
+                        reservation.workflowState,
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 11.sp,
                         modifier = Modifier.padding(horizontal = 4.dp)
@@ -132,18 +144,18 @@ private fun ReservationCard(reservation: Reservation) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (reservation.tablesTotales != null) {
-                    InfoChipText("${reservation.tablesTotales} tables")
+                if (reservation.totalTables > 0) {
+                    InfoChipText("${reservation.totalTables} tables")
                 }
-                if (reservation.prixFinal != null) {
-                    InfoChipText("${reservation.prixFinal}€")
+                if (reservation.finalAmount >= 0) {
+                    InfoChipText("${reservation.finalAmount}€")
                 }
             }
 
-            if (reservation.notes?.isNotBlank() == true) {
+            if (!reservation.gamesNotes.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    reservation.notes,
+                    reservation.gamesNotes,
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2
@@ -152,9 +164,8 @@ private fun ReservationCard(reservation: Reservation) {
 
             // Détails de la réservation
             val extras = buildList {
-                if (reservation.editeurPresenTeJeux == true) add("Présente des jeux")
-                if (reservation.besoinAnimateur == true) add("Besoin animateur")
-                if ((reservation.prisesElectriques ?: 0) > 0) add("${reservation.prisesElectriques} prise(s) élec.")
+                if (reservation.willPresentGames) add("Présente des jeux")
+                if (reservation.powerOutlets > 0) add("${reservation.powerOutlets} prise(s) élec.")
             }
             if (extras.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(6.dp))

@@ -3,7 +3,10 @@ package com.example.myapplication
 import android.app.Application
 import com.example.myapplication.data.AuthManager
 import com.example.myapplication.data.AuthRepository
+import com.example.myapplication.data.EditorRepository
 import com.example.myapplication.data.FestivalRepository
+import com.example.myapplication.data.GameRepository
+import com.example.myapplication.data.InvoiceRepository
 import com.example.myapplication.data.ReservationRepository
 import com.example.myapplication.network.ApiClient
 
@@ -18,7 +21,16 @@ class AwiApplication : Application() {
     lateinit var festivalRepository: FestivalRepository
         private set
 
+    lateinit var editorRepository: EditorRepository
+        private set
+
+    lateinit var gameRepository: GameRepository
+        private set
+
     lateinit var reservationRepository: ReservationRepository
+        private set
+
+    lateinit var invoiceRepository: InvoiceRepository
         private set
 
     override fun onCreate() {
@@ -27,6 +39,9 @@ class AwiApplication : Application() {
         val apiService = ApiClient.create(authManager)
         authRepository = AuthRepository(apiService, authManager)
         festivalRepository = FestivalRepository(apiService)
+        editorRepository = EditorRepository(apiService)
+        gameRepository = GameRepository(apiService)
         reservationRepository = ReservationRepository(apiService)
+        invoiceRepository = InvoiceRepository(apiService)
     }
 }

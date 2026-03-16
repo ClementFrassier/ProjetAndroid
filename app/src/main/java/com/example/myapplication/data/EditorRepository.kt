@@ -1,15 +1,15 @@
 package com.example.myapplication.data
 
-import com.example.myapplication.model.Reservation
-import com.example.myapplication.model.ReservationCreateInput
-import com.example.myapplication.model.ReservationUpdateInput
+import com.example.myapplication.model.Editor
+import com.example.myapplication.model.EditorDetail
+import com.example.myapplication.model.EditorInput
 import com.example.myapplication.network.ApiService
 
-class ReservationRepository(private val api: ApiService) {
+class EditorRepository(private val api: ApiService) {
 
-    suspend fun getReservationsByFestival(festivalId: Int): Result<List<Reservation>> {
+    suspend fun getEditors(): Result<List<Editor>> {
         return try {
-            val response = api.getReservationsByFestival(festivalId)
+            val response = api.getEditors()
             if (response.isSuccessful) {
                 Result.Success(response.body() ?: emptyList())
             } else {
@@ -20,13 +20,13 @@ class ReservationRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun getReservation(id: Int): Result<Reservation> {
+    suspend fun getEditorById(id: Int): Result<EditorDetail> {
         return try {
-            val response = api.getReservation(id)
+            val response = api.getEditorById(id)
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) Result.Success(body)
-                else Result.Error("Réservation introuvable")
+                else Result.Error("Éditeur introuvable")
             } else {
                 Result.Error("Erreur ${response.code()} : ${response.message()}")
             }
@@ -35,13 +35,13 @@ class ReservationRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun createReservation(reservation: ReservationCreateInput): Result<Reservation> {
+    suspend fun createEditor(editor: EditorInput): Result<EditorDetail> {
         return try {
-            val response = api.createReservation(reservation)
+            val response = api.createEditor(editor)
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) Result.Success(body)
-                else Result.Error("Erreur lors de la création")
+                else Result.Error("Erreur lors de la création d'éditeur")
             } else {
                 Result.Error("Erreur ${response.code()} : ${response.message()}")
             }
@@ -50,13 +50,13 @@ class ReservationRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun updateReservation(id: Int, reservation: ReservationUpdateInput): Result<Reservation> {
+    suspend fun updateEditor(id: Int, editor: EditorInput): Result<EditorDetail> {
         return try {
-            val response = api.updateReservation(id, reservation)
+            val response = api.updateEditor(id, editor)
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) Result.Success(body)
-                else Result.Error("Erreur lors de la mise à jour")
+                else Result.Error("Erreur lors de la modification de l'éditeur")
             } else {
                 Result.Error("Erreur ${response.code()} : ${response.message()}")
             }
@@ -65,9 +65,9 @@ class ReservationRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun deleteReservation(id: Int): Result<Unit> {
+    suspend fun deleteEditor(id: Int): Result<Unit> {
         return try {
-            val response = api.deleteReservation(id)
+            val response = api.deleteEditor(id)
             if (response.isSuccessful) {
                 Result.Success(Unit)
             } else {
