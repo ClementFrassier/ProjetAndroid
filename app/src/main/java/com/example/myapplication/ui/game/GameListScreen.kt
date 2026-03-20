@@ -124,7 +124,7 @@ private fun GameCard(game: GameWithEditor, onClick: () -> Unit) {
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
-                    game.editor?.name?.let {
+                    game.editorName?.let {
                         Text(
                             text = "Éditeur : $it",
                             fontSize = 14.sp,

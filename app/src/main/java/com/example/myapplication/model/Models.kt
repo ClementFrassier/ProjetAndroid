@@ -9,8 +9,7 @@ data class LoginRequest(
 
 data class AuthResponse(
     val message: String,
-    val user: UserInfo?,
-    val accessToken: String? = null
+    val user: UserInfo?
 )
 
 data class UserInfo(
@@ -60,20 +59,19 @@ data class EditeurLight(
 data class Editor(
     val id: Int,
     val name: String,
-    val createdAt: String,
-    val updatedAt: String,
-    val contactsCount: Int?,
-    val gamesCount: Int?,
-    val reservationsCount: Int?
+    val description: String? = null,
+    @SerializedName("type_reservant") val typeReservant: String? = null,
+    @SerializedName("est_reservant") val estReservant: Boolean? = null
 )
 
 data class EditorDetail(
     val id: Int,
     val name: String,
-    val createdAt: String,
-    val updatedAt: String,
-    val contacts: List<Contact>,
-    val games: List<Game>
+    val description: String? = null,
+    @SerializedName("type_reservant") val typeReservant: String? = null,
+    @SerializedName("est_reservant") val estReservant: Boolean? = null,
+    val contacts: List<Contact> = emptyList(),
+    val games: List<Game> = emptyList()
 )
 
 data class Contact(
@@ -87,18 +85,21 @@ data class Contact(
 data class Game(
     val id: Int,
     val name: String,
-    val type: String?,
-    val minAge: Int?,
-    val maxAge: Int?
+    @SerializedName("type") val type: String?,
+    @SerializedName("authors") val authors: String? = null,
+    @SerializedName("ageMin") val minAge: Int?,
+    @SerializedName("ageMax") val maxAge: Int?
 )
 
 data class GameWithEditor(
     val id: Int,
-    val name: String,
-    val type: String?,
-    val minAge: Int?,
-    val maxAge: Int?,
-    val editor: EditeurLight?
+    @SerializedName("nom") val name: String,
+    @SerializedName("type_jeu") val type: String?,
+    @SerializedName("auteurs") val authors: String? = null,
+    @SerializedName("age_min") val minAge: Int?,
+    @SerializedName("age_max") val maxAge: Int?,
+    @SerializedName("editeur_id") val editorId: Int? = null,
+    @SerializedName("editeur_name") val editorName: String? = null
 )
 
 data class ContactInput(
@@ -111,24 +112,27 @@ data class ContactInput(
 
 data class GameInput(
     val id: Int? = null,
-    val name: String,
-    val type: String? = null,
-    val minAge: Int? = null,
-    val maxAge: Int? = null
+    @SerializedName("nom") val name: String,
+    @SerializedName("auteurs") val authors: String? = null,
+    @SerializedName("type_jeu") val type: String? = null,
+    @SerializedName("age_min") val minAge: Int? = null,
+    @SerializedName("age_max") val maxAge: Int? = null
 )
 
 data class GameCreateInput(
-    val editorId: Int,
-    val name: String,
-    val type: String? = null,
-    val minAge: Int? = null,
-    val maxAge: Int? = null
+    @SerializedName("editeur_id") val editorId: Int,
+    @SerializedName("nom") val name: String,
+    @SerializedName("auteurs") val authors: String? = null,
+    @SerializedName("type_jeu") val type: String? = null,
+    @SerializedName("age_min") val minAge: Int? = null,
+    @SerializedName("age_max") val maxAge: Int? = null
 )
 
 data class EditorInput(
-    val name: String,
-    val contacts: List<ContactInput>? = null,
-    val games: List<GameInput>? = null
+    @SerializedName("nom") val name: String,
+    val description: String? = null,
+    @SerializedName("type_reservant") val typeReservant: String? = null,
+    @SerializedName("est_reservant") val estReservant: Boolean? = null
 )
 
 data class Jeu(
@@ -145,63 +149,56 @@ data class Jeu(
 )
 
 data class ReservationLine(
-    val id: Int,
-    val reservationId: Int,
-    val tariffZoneId: Int,
-    val tablesCount: Int,
-    val surfaceSquareM: Int?,
-    val pricePerTableSnapshot: Double,
-    val pricePerSquareMSnapshot: Double,
-    val lineTotal: Double
+    @SerializedName("zone_tarifaire_id") val tariffZoneId: Int,
+    @SerializedName("nombre_tables") val tablesCount: Int,
+    @SerializedName("surface_m2") val surfaceSquareM: Double? = null,
+    @SerializedName("zone_nom") val zoneName: String? = null,
+    @SerializedName("prix_table") val pricePerTable: Double? = null,
+    @SerializedName("prix_m2") val pricePerSquareM: Double? = null
 )
 
 data class Reservation(
     val id: Int,
-    val festivalId: Int,
-    val editorId: Int?,
-    val reservantId: Int?,
-    val totalTables: Int,
-    val subtotalAmount: Double,
-    val discountTables: Int,
-    val discountAmount: Double,
-    val finalAmount: Double,
-    val workflowState: String,
-    val willPresentGames: Boolean,
-    val powerOutlets: Int,
-    val gamesNotes: String?,
-    val createdAt: String,
-    val updatedAt: String,
-    val editor: EditeurLight?,
-    val lines: List<ReservationLine>?
-    // Ignored lists for now if not needed: games, contacts, invoices
+    @SerializedName("festival_id") val festivalId: Int,
+    @SerializedName("editeur_id") val editorId: Int?,
+    @SerializedName("tables_totales") val totalTables: Int = 0,
+    @SerializedName("prix_total") val subtotalAmount: Double = 0.0,
+    @SerializedName("remise_tables_offertes") val discountTables: Int = 0,
+    @SerializedName("remise_argent") val discountAmount: Double = 0.0,
+    @SerializedName("prix_final") val finalAmount: Double = 0.0,
+    @SerializedName("statut_workflow") val workflowState: String,
+    @SerializedName("editeur_presente_jeux") val willPresentGames: Boolean = false,
+    @SerializedName("prises_electriques") val powerOutlets: Int = 0,
+    @SerializedName("notes") val gamesNotes: String? = null,
+    @SerializedName("created_at") val createdAt: String? = null,
+    @SerializedName("updated_at") val updatedAt: String? = null,
+    @SerializedName("editeur_nom") val editorName: String? = null,
+    @SerializedName("lignes") val lines: List<ReservationLine>? = null
 )
 
 data class ReservationLineInput(
-    val tariffZoneId: Int,
-    val tablesCount: Int = 0,
-    val surfaceM2: Double? = null
+    @SerializedName("zone_tarifaire_id") val tariffZoneId: Int,
+    @SerializedName("nombre_tables") val tablesCount: Int = 0,
+    @SerializedName("surface_m2") val surfaceM2: Double? = null
 )
 
 data class ReservationCreateInput(
-    val festivalId: Int,
-    val editorId: Int? = null,
-    val reservantId: Int? = null,
-    val willPresentGames: Boolean? = null,
-    val powerOutlets: Int? = null,
-    val discountTables: Int? = null,
-    val discountAmount: Double? = null,
-    val lines: List<ReservationLineInput>
+    @SerializedName("festival_id") val festivalId: Int,
+    @SerializedName("editeur_id") val editorId: Int? = null,
+    @SerializedName("editeur_presente_jeux") val willPresentGames: Boolean? = null,
+    @SerializedName("prises_electriques") val powerOutlets: Int? = null,
+    @SerializedName("remise_tables_offertes") val discountTables: Int? = null,
+    @SerializedName("remise_argent") val discountAmount: Double? = null,
+    @SerializedName("lignes") val lines: List<ReservationLineInput>
 )
 
 data class ReservationUpdateInput(
-    val reservantId: Int? = null,
-    val editorId: Int? = null,
-    val willPresentGames: Boolean? = null,
-    val discountTables: Int? = null,
-    val discountAmount: Double? = null,
-    val powerOutlets: Int? = null,
-    val gamesNotes: String? = null,
-    val workflowState: String? = null
+    @SerializedName("editeur_presente_jeux") val willPresentGames: Boolean? = null,
+    @SerializedName("remise_tables_offertes") val discountTables: Int? = null,
+    @SerializedName("remise_argent") val discountAmount: Double? = null,
+    @SerializedName("prises_electriques") val powerOutlets: Int? = null,
+    @SerializedName("notes") val gamesNotes: String? = null,
+    @SerializedName("statut_workflow") val workflowState: String? = null
 )
 
 data class FestivalLight(
@@ -211,25 +208,37 @@ data class FestivalLight(
 
 data class Invoice(
     val id: Int,
-    val invoiceNumber: String,
-    val issueDate: String,
-    val dueDate: String,
-    val amount: Double,
-    val isPaid: Boolean,
-    val paidAt: String? = null,
-    val notes: String? = null,
-    val reservationId: Int? = null,
-    val festival: FestivalLight? = null,
-    val editor: EditeurLight? = null,
-    val reservation: Reservation? = null,
-    val createdAt: String? = null
+    @SerializedName("reservation_id") val reservationId: Int,
+    @SerializedName("numero") val invoiceNumber: String,
+    @SerializedName("montant_ttc") val amount: Double,
+    @SerializedName("statut") val status: String,
+    @SerializedName("emise_le") val issueDate: String,
+    @SerializedName("payee_le") val paidAt: String? = null
 )
 
-data class InvoiceCreateInput(
-    val reservationId: Int,
-    val issueDate: String,
-    val dueDate: String,
-    val notes: String? = null
+data class InvoiceResponse(
+    val message: String,
+    val facture: Invoice
+)
+
+data class FestivalResponse(
+    val message: String,
+    val festival: Festival
+)
+
+data class EditorResponse(
+    val message: String,
+    val editeur: EditorDetail
+)
+
+data class GameResponse(
+    val message: String,
+    val jeu: GameWithEditor
+)
+
+data class ReservationResponse(
+    val message: String,
+    val reservation: Reservation
 )
 
 // USERS
@@ -248,67 +257,4 @@ data class CreateUserInput(
 
 data class UpdateUserRoleInput(
     val role: String
-)
-
-// RESERVANTS
-data class ReservantContactEvent(
-    val id: Int,
-    val statusId: Int,
-    val occurredAt: String,
-    val channel: String?,
-    val notes: String?,
-    val createdByUserId: Int?
-)
-
-data class ReservantStatus(
-    val status: String,
-    val lastContactAt: String?,
-    val notes: String?,
-    val lastContactEvent: ReservantContactEvent?
-)
-
-data class Reservant(
-    val id: Int,
-    val type: String,
-    val displayName: String,
-    val legalName: String?,
-    val email: String?,
-    val phone: String?,
-    val notes: String?,
-    val editor: EditeurLight?,
-    val reservationsCount: Int? = null,
-    val currentStatus: ReservantStatus? = null,
-    val lastContactAt: String? = null,
-    val hasReservation: Boolean? = null
-)
-
-data class CreateReservantInput(
-    val type: String,
-    val displayName: String,
-    val legalName: String? = null,
-    val email: String? = null,
-    val phone: String? = null,
-    val notes: String? = null,
-    val editorId: Int? = null
-)
-
-data class UpdateReservantInput(
-    val type: String? = null,
-    val displayName: String? = null,
-    val legalName: String? = null,
-    val email: String? = null,
-    val phone: String? = null,
-    val notes: String? = null,
-    val editorId: Int? = null
-)
-
-data class UpdateReservantStatusInput(
-    val status: String,
-    val notes: String? = null
-)
-
-data class AddReservantContactInput(
-    val occurredAt: String,
-    val channel: String? = null,
-    val notes: String? = null
 )
