@@ -18,19 +18,13 @@ class AuthRepository(
             val response = api.login(LoginRequest(login, password))
             if (response.isSuccessful) {
                 val body = response.body()
-                // On stocke le token depuis le header Authorization de la réponse
-                // ou depuis le champ accessToken si le backend le retourne
-                val token = response.headers()["Authorization"]?.removePrefix("Bearer ")
-                    ?: body?.accessToken
-
-                if (token != null) {
-                    authManager.saveToken(token)
-                }
                 val userInfo = body?.user
                 if (userInfo != null) {
                     authManager.saveUserInfo(userInfo.login, userInfo.role)
+                    Result.Success(Unit)
+                } else {
+                    Result.Error("Session ouverte mais utilisateur introuvable")
                 }
-                Result.Success(Unit)
             } else {
                 Result.Error("Login ou mot de passe incorrect")
             }
@@ -54,8 +48,9 @@ class AuthRepository(
         return try {
             val response = api.whoami()
             if (response.isSuccessful) {
-                val user = response.body()?.get("user")
+                val user = response.body()?.user
                 if (user != null) {
+                    authManager.saveUserInfo(user.login, user.role)
                     Result.Success(Pair(user.login, user.role))
                 } else {
                     Result.Error("Utilisateur introuvable")

@@ -57,7 +57,7 @@ fun GameDetailScreen(
             type = game.type ?: ""
             minAge = game.minAge?.toString() ?: ""
             maxAge = game.maxAge?.toString() ?: ""
-            selectedEditorId = game.editor?.id
+            selectedEditorId = game.editorId
         }
     }
     
@@ -138,7 +138,7 @@ fun GameDetailScreen(
                     }
                 } else {
                     OutlinedTextField(
-                        value = state.game?.editor?.name ?: "Inconnu",
+                        value = state.game?.editorName ?: "Inconnu",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Éditeur") },

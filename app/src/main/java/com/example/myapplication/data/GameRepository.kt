@@ -39,7 +39,7 @@ class GameRepository(private val api: ApiService) {
         return try {
             val response = api.createGame(game)
             if (response.isSuccessful) {
-                val body = response.body()
+                val body = response.body()?.jeu
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la création du jeu")
             } else {
@@ -54,7 +54,7 @@ class GameRepository(private val api: ApiService) {
         return try {
             val response = api.updateGame(id, game)
             if (response.isSuccessful) {
-                val body = response.body()
+                val body = response.body()?.jeu
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la modification du jeu")
             } else {

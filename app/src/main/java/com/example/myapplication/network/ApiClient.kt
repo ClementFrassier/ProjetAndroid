@@ -1,6 +1,9 @@
 package com.example.myapplication.network
 
 import com.example.myapplication.data.AuthManager
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -30,6 +33,7 @@ object ApiClient {
         val sslContext = SSLContext.getInstance("TLS").apply {
             init(null, trustManagers, SecureRandom())
         }
+        val cookieStore = mutableMapOf<String, List<Cookie>>()
 
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -38,16 +42,17 @@ object ApiClient {
         return OkHttpClient.Builder()
             .sslSocketFactory(sslContext.socketFactory, getUnsafeTrustManager())
             .hostnameVerifier { _, _ -> true } // Dev uniquement
-            .addInterceptor { chain ->
-                val token = authManager.getToken()
-                val request = if (token != null) {
-                    chain.request().newBuilder()
-                        .addHeader("Authorization", "Bearer $token")
-                        .build()
-                } else {
-                    chain.request()
+            .cookieJar(object : CookieJar {
+                override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
+                    cookieStore[url.host] = cookies
                 }
-                chain.proceed(request)
+
+                override fun loadForRequest(url: HttpUrl): List<Cookie> {
+                    return cookieStore[url.host].orEmpty()
+                }
+            })
+            .addInterceptor { chain ->
+                chain.proceed(chain.request())
             }
             .addInterceptor(logging)
             .build()

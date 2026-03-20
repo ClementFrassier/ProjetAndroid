@@ -14,7 +14,7 @@ interface ApiService {
     suspend fun logout(): Response<Map<String, String>>
 
     @GET("api/auth/whoami")
-    suspend fun whoami(): Response<Map<String, UserInfo>>
+    suspend fun whoami(): Response<AuthResponse>
 
     // FESTIVALS
     @GET("api/festivals")
@@ -24,78 +24,65 @@ interface ApiService {
     suspend fun getFestival(@Path("id") id: Int): Response<Festival>
 
     @POST("api/festivals")
-    suspend fun createFestival(@Body request: CreateFestivalRequest): Response<Festival>
-
-    @GET("api/festivals/{id}/games")
-    suspend fun getFestivalGames(@Path("id") id: Int): Response<List<Jeu>>
+    suspend fun createFestival(@Body request: CreateFestivalRequest): Response<FestivalResponse>
 
     // RÉSERVATIONS
-    @GET("api/reservations")
-    suspend fun getReservationsByFestival(@Query("festivalId") festivalId: Int): Response<List<Reservation>>
+    @GET("api/reservations/festival/{festivalId}")
+    suspend fun getReservationsByFestival(@Path("festivalId") festivalId: Int): Response<List<Reservation>>
 
     @GET("api/reservations/{id}")
     suspend fun getReservation(@Path("id") id: Int): Response<Reservation>
 
     @POST("api/reservations")
-    suspend fun createReservation(@Body reservation: ReservationCreateInput): Response<Reservation>
+    suspend fun createReservation(@Body reservation: ReservationCreateInput): Response<ReservationResponse>
 
     @PUT("api/reservations/{id}")
-    suspend fun updateReservation(@Path("id") id: Int, @Body reservation: ReservationUpdateInput): Response<Reservation>
+    suspend fun updateReservation(@Path("id") id: Int, @Body reservation: ReservationUpdateInput): Response<ReservationResponse>
 
     @DELETE("api/reservations/{id}")
     suspend fun deleteReservation(@Path("id") id: Int): Response<Unit>
 
     // EDITORS
-    @GET("api/editors")
+    @GET("api/editeurs")
     suspend fun getEditors(): Response<List<Editor>>
 
-    @GET("api/editors/{id}")
+    @GET("api/editeurs/{id}")
     suspend fun getEditorById(@Path("id") id: Int): Response<EditorDetail>
 
-    @POST("api/editors")
-    suspend fun createEditor(@Body editor: EditorInput): Response<EditorDetail>
+    @GET("api/editeurs/{id}/jeux")
+    suspend fun getEditorGames(@Path("id") id: Int): Response<List<Game>>
 
-    @PUT("api/editors/{id}")
-    suspend fun updateEditor(@Path("id") id: Int, @Body editor: EditorInput): Response<EditorDetail>
+    @POST("api/editeurs")
+    suspend fun createEditor(@Body editor: EditorInput): Response<EditorResponse>
 
-    @DELETE("api/editors/{id}")
-    suspend fun deleteEditor(@Path("id") id: Int): Response<Unit>
+    @PUT("api/editeurs/{id}")
+    suspend fun updateEditor(@Path("id") id: Int, @Body editor: EditorInput): Response<EditorResponse>
 
     // GAMES
-    @GET("api/games")
-    suspend fun getGames(@Query("editorId") editorId: Int? = null): Response<List<GameWithEditor>>
+    @GET("api/jeux")
+    suspend fun getGames(@Query("editeur_id") editorId: Int? = null): Response<List<GameWithEditor>>
 
-    @GET("api/games/{id}")
+    @GET("api/jeux/{id}")
     suspend fun getGameById(@Path("id") id: Int): Response<GameWithEditor>
 
-    @POST("api/games")
-    suspend fun createGame(@Body game: GameCreateInput): Response<GameWithEditor>
+    @POST("api/jeux")
+    suspend fun createGame(@Body game: GameCreateInput): Response<GameResponse>
 
-    @PUT("api/games/{id}")
-    suspend fun updateGame(@Path("id") id: Int, @Body game: GameInput): Response<GameWithEditor>
+    @PUT("api/jeux/{id}")
+    suspend fun updateGame(@Path("id") id: Int, @Body game: GameInput): Response<GameResponse>
 
-    @DELETE("api/games/{id}")
+    @DELETE("api/jeux/{id}")
     suspend fun deleteGame(@Path("id") id: Int): Response<Unit>
 
     // INVOICES
-    @GET("api/invoices")
-    suspend fun getInvoices(
-        @Query("festivalId") festivalId: Int? = null,
-        @Query("editorId") editorId: Int? = null,
-        @Query("isPaid") isPaid: Boolean? = null
-    ): Response<List<Invoice>>
+    @GET("api/factures/reservation/{reservationId}")
+    suspend fun getInvoiceByReservation(@Path("reservationId") reservationId: Int): Response<Invoice>
 
-    @GET("api/invoices/{id}")
-    suspend fun getInvoiceById(@Path("id") id: Int): Response<Invoice>
+    @POST("api/reservations/{reservationId}/factures")
+    suspend fun createInvoiceForReservation(@Path("reservationId") reservationId: Int): Response<InvoiceResponse>
 
-    @POST("api/invoices")
-    suspend fun createInvoice(@Body invoice: InvoiceCreateInput): Response<Invoice>
-
-    @PATCH("api/invoices/{id}/pay")
-    suspend fun markInvoiceAsPaid(@Path("id") id: Int): Response<Invoice>
-
-    @DELETE("api/invoices/{id}")
-    suspend fun deleteInvoice(@Path("id") id: Int): Response<Unit>
+    @PUT("api/factures/{id}/payee")
+    suspend fun markInvoiceAsPaid(@Path("id") id: Int): Response<InvoiceResponse>
 
     // ZONES TARIFAIRES
     @GET("api/zones-tarifaires")
@@ -113,38 +100,4 @@ interface ApiService {
 
     @DELETE("api/users/{id}")
     suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
-
-    // RESERVANTS
-    @GET("api/reservants")
-    suspend fun getReservants(
-        @Query("search") search: String? = null,
-        @Query("type") type: String? = null,
-        @Query("festivalId") festivalId: Int? = null
-    ): Response<List<Reservant>>
-
-    @GET("api/reservants/{id}")
-    suspend fun getReservantById(@Path("id") id: Int): Response<Reservant>
-
-    @POST("api/reservants")
-    suspend fun createReservant(@Body reservant: CreateReservantInput): Response<Reservant>
-
-    @PUT("api/reservants/{id}")
-    suspend fun updateReservant(@Path("id") id: Int, @Body reservant: UpdateReservantInput): Response<Reservant>
-
-    @DELETE("api/reservants/{id}")
-    suspend fun deleteReservant(@Path("id") id: Int): Response<Unit>
-
-    @PUT("api/reservants/{id}/festivals/{festivalId}/status")
-    suspend fun updateReservantStatus(
-        @Path("id") id: Int,
-        @Path("festivalId") festivalId: Int,
-        @Body payload: UpdateReservantStatusInput
-    ): Response<Unit>
-
-    @POST("api/reservants/{id}/festivals/{festivalId}/contacts")
-    suspend fun addReservantContact(
-        @Path("id") id: Int,
-        @Path("festivalId") festivalId: Int,
-        @Body payload: AddReservantContactInput
-    ): Response<Unit>
 }

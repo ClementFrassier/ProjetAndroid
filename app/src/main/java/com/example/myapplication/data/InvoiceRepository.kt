@@ -1,46 +1,30 @@
 package com.example.myapplication.data
 
 import com.example.myapplication.model.Invoice
-import com.example.myapplication.model.InvoiceCreateInput
 import com.example.myapplication.network.ApiService
 
 class InvoiceRepository(private val api: ApiService) {
 
-    suspend fun getInvoices(festivalId: Int? = null, editorId: Int? = null, isPaid: Boolean? = null): Result<List<Invoice>> {
+    suspend fun getInvoiceByReservation(reservationId: Int): Result<Invoice?> {
         return try {
-            val response = api.getInvoices(festivalId, editorId, isPaid)
-            if (response.isSuccessful) {
-                Result.Success(response.body() ?: emptyList())
-            } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+            val response = api.getInvoiceByReservation(reservationId)
+            when {
+                response.isSuccessful -> Result.Success(response.body())
+                response.code() == 404 -> Result.Success(null)
+                else -> Result.Error("Erreur ${response.code()} : ${response.message()}")
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
         }
     }
 
-    suspend fun getInvoiceById(id: Int): Result<Invoice> {
+    suspend fun createInvoiceForReservation(reservationId: Int): Result<Invoice> {
         return try {
-            val response = api.getInvoiceById(id)
+            val response = api.createInvoiceForReservation(reservationId)
             if (response.isSuccessful) {
-                val body = response.body()
+                val body = response.body()?.facture
                 if (body != null) Result.Success(body)
-                else Result.Error("Facture introuvable")
-            } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
-            }
-        } catch (e: Exception) {
-            Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
-        }
-    }
-
-    suspend fun createInvoice(invoice: InvoiceCreateInput): Result<Invoice> {
-        return try {
-            val response = api.createInvoice(invoice)
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) Result.Success(body)
-                else Result.Error("Erreur lors de la création")
+                else Result.Error("Facture créée mais retour vide")
             } else {
                 Result.Error("Erreur ${response.code()} : ${response.message()}")
             }
@@ -53,22 +37,9 @@ class InvoiceRepository(private val api: ApiService) {
         return try {
             val response = api.markInvoiceAsPaid(id)
             if (response.isSuccessful) {
-                val body = response.body()
+                val body = response.body()?.facture
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la mise à jour")
-            } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
-            }
-        } catch (e: Exception) {
-            Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
-        }
-    }
-
-    suspend fun deleteInvoice(id: Int): Result<Unit> {
-        return try {
-            val response = api.deleteInvoice(id)
-            if (response.isSuccessful) {
-                Result.Success(Unit)
             } else {
                 Result.Error("Erreur ${response.code()} : ${response.message()}")
             }

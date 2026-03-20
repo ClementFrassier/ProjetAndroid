@@ -22,13 +22,18 @@ class EditorRepository(private val api: ApiService) {
 
     suspend fun getEditorById(id: Int): Result<EditorDetail> {
         return try {
-            val response = api.getEditorById(id)
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) Result.Success(body)
+            val editorResponse = api.getEditorById(id)
+            val gamesResponse = api.getEditorGames(id)
+            if (editorResponse.isSuccessful) {
+                val body = editorResponse.body()
+                if (body != null) {
+                    Result.Success(
+                        body.copy(games = gamesResponse.body().orEmpty())
+                    )
+                }
                 else Result.Error("Éditeur introuvable")
             } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+                Result.Error("Erreur ${editorResponse.code()} : ${editorResponse.message()}")
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
@@ -39,7 +44,7 @@ class EditorRepository(private val api: ApiService) {
         return try {
             val response = api.createEditor(editor)
             if (response.isSuccessful) {
-                val body = response.body()
+                val body = response.body()?.editeur
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la création d'éditeur")
             } else {
@@ -54,7 +59,7 @@ class EditorRepository(private val api: ApiService) {
         return try {
             val response = api.updateEditor(id, editor)
             if (response.isSuccessful) {
-                val body = response.body()
+                val body = response.body()?.editeur
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la modification de l'éditeur")
             } else {
@@ -65,16 +70,5 @@ class EditorRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun deleteEditor(id: Int): Result<Unit> {
-        return try {
-            val response = api.deleteEditor(id)
-            if (response.isSuccessful) {
-                Result.Success(Unit)
-            } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
-            }
-        } catch (e: Exception) {
-            Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
-        }
-    }
+    suspend fun deleteEditor(id: Int): Result<Unit> = Result.Error("Suppression non disponible côté API mobile")
 }

@@ -126,7 +126,7 @@ private fun ReservationCard(reservation: Reservation, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    reservation.editor?.name ?: "Éditeur ou Réservant #${reservation.editorId ?: reservation.reservantId}",
+                    reservation.editorName ?: "Éditeur #${reservation.editorId}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     modifier = Modifier.weight(1f)

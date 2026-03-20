@@ -128,15 +128,20 @@ private fun EditorCard(editor: Editor, onClick: () -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 AssistChip(
                     onClick = {},
-                    label = { Text("${editor.contactsCount ?: 0} contacts") }
+                    label = { Text(editor.typeReservant ?: "editeur") }
                 )
                 AssistChip(
                     onClick = {},
-                    label = { Text("${editor.gamesCount ?: 0} jeux") }
+                    label = { Text(if (editor.estReservant == false) "sans réservation" else "réservant") }
                 )
-                AssistChip(
-                    onClick = {},
-                    label = { Text("${editor.reservationsCount ?: 0} résas") }
+            }
+            if (!editor.description.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = editor.description,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2
                 )
             }
         }

@@ -39,7 +39,7 @@ class ReservationRepository(private val api: ApiService) {
         return try {
             val response = api.createReservation(reservation)
             if (response.isSuccessful) {
-                val body = response.body()
+                val body = response.body()?.reservation
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la création")
             } else {
@@ -54,7 +54,7 @@ class ReservationRepository(private val api: ApiService) {
         return try {
             val response = api.updateReservation(id, reservation)
             if (response.isSuccessful) {
-                val body = response.body()
+                val body = response.body()?.reservation
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la mise à jour")
             } else {

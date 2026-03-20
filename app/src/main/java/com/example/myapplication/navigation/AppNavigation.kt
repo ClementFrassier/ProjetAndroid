@@ -23,7 +23,6 @@ import com.example.myapplication.ui.editor.EditorDetailScreen
 import com.example.myapplication.ui.game.GameListScreen
 import com.example.myapplication.ui.game.GameDetailScreen
 import com.example.myapplication.ui.reservation.ReservationDetailScreen
-import com.example.myapplication.ui.invoice.InvoiceListScreen
 import com.example.myapplication.ui.invoice.InvoiceDetailScreen
 import com.example.myapplication.ui.viewmodel.InvoiceViewModel
 
@@ -35,10 +34,7 @@ object Routes {
     const val RESERVATIONS = "reservations/{festivalId}"
     const val RESERVATION_DETAIL = "reservations/{festivalId}/detail/{reservationId}"
     const val RESERVATION_CREATE = "reservations/{festivalId}/create"
-
-    const val INVOICES = "invoices/{festivalId}"
-    const val INVOICE_DETAIL = "invoice_detail/{invoiceId}"
-    const val INVOICE_CREATE = "invoice_create/{reservationId}"
+    const val RESERVATION_INVOICE = "reservations/{reservationId}/invoice"
 
     const val EDITORS = "editors"
     const val EDITOR_DETAIL = "editors/{editorId}"
@@ -52,9 +48,7 @@ object Routes {
     fun reservationDetail(festivalId: Int, reservationId: Int) = "reservations/$festivalId/detail/$reservationId"
     fun reservationCreate(festivalId: Int) = "reservations/$festivalId/create"
     
-    fun invoices(festivalId: Int) = "invoices/$festivalId"
-    fun invoiceDetail(id: Int) = "invoice_detail/$id"
-    fun invoiceCreate(reservationId: Int) = "invoice_create/$reservationId"
+    fun reservationInvoice(reservationId: Int) = "reservations/$reservationId/invoice"
 
     fun editorDetail(id: Int) = "editors/$id"
     fun gameDetail(id: Int) = "games/$id"
@@ -83,7 +77,7 @@ fun AppNavigation(application: AwiApplication) {
         factory = InvoiceViewModel.Factory(application.invoiceRepository)
     )
 
-    val startDestination = Routes.FESTIVALS
+    val startDestination = Routes.LOGIN
 
     NavHost(navController = navController, startDestination = startDestination) {
 
@@ -136,9 +130,6 @@ fun AppNavigation(application: AwiApplication) {
                 onBack = { navController.popBackStack() },
                 onViewReservations = { id ->
                     navController.navigate(Routes.reservations(id))
-                },
-                onViewInvoices = { id ->
-                    navController.navigate(Routes.invoices(id))
                 }
             )
         }
@@ -186,6 +177,9 @@ fun AppNavigation(application: AwiApplication) {
                 viewModel = reservationViewModel,
                 festivalViewModel = festivalViewModel,
                 editorViewModel = editorViewModel,
+                onManageInvoice = { id ->
+                    navController.navigate(Routes.reservationInvoice(id))
+                },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -201,47 +195,17 @@ fun AppNavigation(application: AwiApplication) {
                 viewModel = reservationViewModel,
                 festivalViewModel = festivalViewModel,
                 editorViewModel = editorViewModel,
+                onManageInvoice = {},
                 onBack = { navController.popBackStack() }
             )
         }
 
         composable(
-            route = Routes.INVOICES,
-            arguments = listOf(navArgument("festivalId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val festivalId = backStackEntry.arguments?.getInt("festivalId") ?: return@composable
-            InvoiceListScreen(
-                festivalId = festivalId,
-                viewModel = invoiceViewModel,
-                onInvoiceClick = { id -> navController.navigate(Routes.invoiceDetail(id)) },
-                onCreateInvoice = { 
-                    // Pour simplifier, la création manuelle nécessitera de passer la reservationId.
-                    // Optionnellement on peut afficher une erreur ou rediriger, ou demander la réservation.
-                },
-                onBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(
-            route = Routes.INVOICE_DETAIL,
-            arguments = listOf(navArgument("invoiceId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val invoiceId = backStackEntry.arguments?.getInt("invoiceId") ?: return@composable
-            InvoiceDetailScreen(
-                invoiceId = invoiceId,
-                reservationId = null,
-                viewModel = invoiceViewModel,
-                onBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(
-            route = Routes.INVOICE_CREATE,
+            route = Routes.RESERVATION_INVOICE,
             arguments = listOf(navArgument("reservationId") { type = NavType.IntType })
         ) { backStackEntry ->
             val reservationId = backStackEntry.arguments?.getInt("reservationId") ?: return@composable
             InvoiceDetailScreen(
-                invoiceId = null,
                 reservationId = reservationId,
                 viewModel = invoiceViewModel,
                 onBack = { navController.popBackStack() }

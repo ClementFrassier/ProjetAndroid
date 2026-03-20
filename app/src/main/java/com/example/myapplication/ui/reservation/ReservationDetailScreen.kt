@@ -29,6 +29,7 @@ fun ReservationDetailScreen(
     viewModel: ReservationViewModel,
     festivalViewModel: FestivalViewModel,
     editorViewModel: EditorViewModel,
+    onManageInvoice: (Int) -> Unit,
     onBack: () -> Unit
 ) {
     val state by viewModel.detailState.collectAsState()
@@ -156,7 +157,7 @@ fun ReservationDetailScreen(
                         }
                     } else {
                         OutlinedTextField(
-                            value = state.reservation?.editor?.name ?: "Inconnu",
+                            value = state.reservation?.editorName ?: "Inconnu",
                             onValueChange = {},
                             readOnly = true,
                             label = { Text("Éditeur") },
@@ -255,7 +256,6 @@ fun ReservationDetailScreen(
                                 viewModel.updateReservation(
                                     reservationId,
                                     ReservationUpdateInput(
-                                        editorId = selectedEditorId,
                                         willPresentGames = willPresentGames,
                                         powerOutlets = outlets,
                                         gamesNotes = gamesNotes.takeIf { it.isNotBlank() }
@@ -273,6 +273,17 @@ fun ReservationDetailScreen(
                             CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
                         } else {
                             Text(if (reservationId == null) "Créer la réservation" else "Mettre à jour")
+                        }
+                    }
+                }
+
+                if (reservationId != null) {
+                    item {
+                        OutlinedButton(
+                            onClick = { onManageInvoice(reservationId) },
+                            modifier = Modifier.fillMaxWidth().height(48.dp)
+                        ) {
+                            Text("Gérer la facture")
                         }
                     }
                 }

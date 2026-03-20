@@ -17,14 +17,6 @@ local.properties
 # ================================
 # Backend Node.js
 # ================================
-projet_awi/backend/node_modules/
-projet_awi/frontend/node_modules/
-
-
-# Certificats SSL (ne jamais versionner des clés privées)
-projet_awi/backend/certs/*.pem
-projet_awi/backend/certs/*.key
-projet_awi/backend/certs/*.crt
 
 # Base de données SQLite locale
 *.sqlite
