@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.ReservationCreateInput
 import com.example.myapplication.model.ReservationLineInput
 import com.example.myapplication.model.ReservationUpdateInput
+import com.example.myapplication.ui.viewmodel.AuthViewModel
 import com.example.myapplication.ui.viewmodel.EditorViewModel
 import com.example.myapplication.ui.viewmodel.FestivalViewModel
 import com.example.myapplication.ui.viewmodel.ReservationViewModel
@@ -27,6 +28,7 @@ fun ReservationDetailScreen(
     festivalId: Int,
     reservationId: Int?,
     viewModel: ReservationViewModel,
+    authViewModel: AuthViewModel,
     festivalViewModel: FestivalViewModel,
     editorViewModel: EditorViewModel,
     onManageInvoice: (Int) -> Unit,
@@ -35,6 +37,7 @@ fun ReservationDetailScreen(
     val state by viewModel.detailState.collectAsState()
     val festivalState by festivalViewModel.detailState.collectAsState()
     val editorState by editorViewModel.listState.collectAsState()
+    val canManageReservations = authViewModel.canManageReservations()
 
     var selectedEditorId by remember { mutableStateOf<Int?>(null) }
     var expandedEditorDropdown by remember { mutableStateOf(false) }
@@ -92,7 +95,7 @@ fun ReservationDetailScreen(
                     }
                 },
                 actions = {
-                    if (reservationId != null) {
+                    if (reservationId != null && canManageReservations) {
                         IconButton(onClick = { viewModel.deleteReservation(reservationId, festivalId) }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Supprimer")
                         }
@@ -265,10 +268,10 @@ fun ReservationDetailScreen(
                                     festivalId
                                 )
                             }
-                        },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        enabled = !state.isSaving && (selectedEditorId != null || reservationId != null)
-                    ) {
+                    },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    enabled = canManageReservations && !state.isSaving && (selectedEditorId != null || reservationId != null)
+                ) {
                         if (state.isSaving) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
                         } else {
@@ -277,7 +280,7 @@ fun ReservationDetailScreen(
                     }
                 }
 
-                if (reservationId != null) {
+                if (reservationId != null && canManageReservations) {
                     item {
                         OutlinedButton(
                             onClick = { onManageInvoice(reservationId) },
