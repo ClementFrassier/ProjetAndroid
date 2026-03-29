@@ -127,6 +127,7 @@ fun AppNavigation(application: AwiApplication) {
             FestivalDetailScreen(
                 festivalId = festivalId,
                 viewModel = festivalViewModel,
+                authViewModel = authViewModel,
                 onBack = { navController.popBackStack() },
                 onViewReservations = { id ->
                     navController.navigate(Routes.reservations(id))
@@ -152,6 +153,7 @@ fun AppNavigation(application: AwiApplication) {
             ReservationListScreen(
                 festivalId = festivalId,
                 viewModel = reservationViewModel,
+                authViewModel = authViewModel,
                 onReservationClick = { resId ->
                     navController.navigate(Routes.reservationDetail(festivalId, resId))
                 },
@@ -175,6 +177,7 @@ fun AppNavigation(application: AwiApplication) {
                 festivalId = festivalId,
                 reservationId = reservationId,
                 viewModel = reservationViewModel,
+                authViewModel = authViewModel,
                 festivalViewModel = festivalViewModel,
                 editorViewModel = editorViewModel,
                 onManageInvoice = { id ->
@@ -193,6 +196,7 @@ fun AppNavigation(application: AwiApplication) {
                 festivalId = festivalId,
                 reservationId = null,
                 viewModel = reservationViewModel,
+                authViewModel = authViewModel,
                 festivalViewModel = festivalViewModel,
                 editorViewModel = editorViewModel,
                 onManageInvoice = {},
@@ -215,6 +219,7 @@ fun AppNavigation(application: AwiApplication) {
         composable(Routes.EDITORS) {
             EditorListScreen(
                 viewModel = editorViewModel,
+                authViewModel = authViewModel,
                 onEditorClick = { id ->
                     navController.navigate(Routes.editorDetail(id))
                 },
@@ -233,6 +238,7 @@ fun AppNavigation(application: AwiApplication) {
             EditorDetailScreen(
                 editorId = editorId,
                 viewModel = editorViewModel,
+                authViewModel = authViewModel,
                 onBack = { navController.popBackStack() }
             )
         }
@@ -241,6 +247,7 @@ fun AppNavigation(application: AwiApplication) {
             EditorDetailScreen(
                 editorId = null,
                 viewModel = editorViewModel,
+                authViewModel = authViewModel,
                 onBack = { navController.popBackStack() }
             )
         }
@@ -248,6 +255,7 @@ fun AppNavigation(application: AwiApplication) {
         composable(Routes.GAMES) {
             GameListScreen(
                 viewModel = gameViewModel,
+                authViewModel = authViewModel,
                 onGameClick = { id ->
                     navController.navigate(Routes.gameDetail(id))
                 },
@@ -266,6 +274,7 @@ fun AppNavigation(application: AwiApplication) {
             GameDetailScreen(
                 gameId = gameId,
                 viewModel = gameViewModel,
+                authViewModel = authViewModel,
                 editorViewModel = editorViewModel,
                 onBack = { navController.popBackStack() }
             )
@@ -275,6 +284,7 @@ fun AppNavigation(application: AwiApplication) {
             GameDetailScreen(
                 gameId = null,
                 viewModel = gameViewModel,
+                authViewModel = authViewModel,
                 editorViewModel = editorViewModel,
                 onBack = { navController.popBackStack() }
             )

@@ -36,6 +36,7 @@ fun FestivalListScreen(
 ) {
     val state by festivalViewModel.listState.collectAsState()
     val authState by authViewModel.uiState.collectAsState()
+    val canManageFestivals = authViewModel.canManageFestivals()
 
     LaunchedEffect(Unit) {
         festivalViewModel.loadFestivals()
@@ -82,7 +83,7 @@ fun FestivalListScreen(
             )
         },
         floatingActionButton = {
-            if (authState.isLoggedIn) {
+            if (authState.isLoggedIn && canManageFestivals) {
                 FloatingActionButton(onClick = onNavigateToCreateFestival) {
                     Icon(Icons.Default.Add, contentDescription = "Créer un festival")
                 }

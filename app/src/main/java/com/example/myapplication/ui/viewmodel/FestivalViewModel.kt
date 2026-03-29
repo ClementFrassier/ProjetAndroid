@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.FestivalRepository
 import com.example.myapplication.data.Result
 import com.example.myapplication.model.Festival
+import com.example.myapplication.model.Jeu
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ data class FestivalListUiState(
 data class FestivalDetailUiState(
     val isLoading: Boolean = false,
     val festival: Festival? = null,
+    val games: List<Jeu> = emptyList(),
     val errorMessage: String? = null
 )
 
@@ -52,6 +54,15 @@ class FestivalViewModel(private val repository: FestivalRepository) : ViewModel(
                     isLoading = false,
                     errorMessage = result.message
                 )
+            }
+        }
+    }
+
+    fun loadFestivalGames(id: Int) {
+        viewModelScope.launch {
+            when (val result = repository.getFestivalGames(id)) {
+                is Result.Success -> _detailState.value = _detailState.value.copy(games = result.data)
+                is Result.Error -> _detailState.value = _detailState.value.copy(errorMessage = result.message)
             }
         }
     }

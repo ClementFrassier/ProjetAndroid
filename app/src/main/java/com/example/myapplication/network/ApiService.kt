@@ -26,6 +26,9 @@ interface ApiService {
     @POST("api/festivals")
     suspend fun createFestival(@Body request: CreateFestivalRequest): Response<FestivalResponse>
 
+    @GET("api/festivals/{id}/games")
+    suspend fun getFestivalGames(@Path("id") id: Int): Response<List<Jeu>>
+
     // RÉSERVATIONS
     @GET("api/reservations/festival/{festivalId}")
     suspend fun getReservationsByFestival(@Path("festivalId") festivalId: Int): Response<List<Reservation>>

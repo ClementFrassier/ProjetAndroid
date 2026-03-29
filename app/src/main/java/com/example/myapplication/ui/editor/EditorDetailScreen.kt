@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.EditorInput
+import com.example.myapplication.ui.viewmodel.AuthViewModel
 import com.example.myapplication.ui.viewmodel.EditorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,9 +45,11 @@ import com.example.myapplication.ui.viewmodel.EditorViewModel
 fun EditorDetailScreen(
     editorId: Int?,
     viewModel: EditorViewModel,
+    authViewModel: AuthViewModel,
     onBack: () -> Unit
 ) {
     val state by viewModel.detailState.collectAsState()
+    val canManageEditors = authViewModel.canManageFestivals()
 
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -86,7 +89,7 @@ fun EditorDetailScreen(
                     }
                 },
                 actions = {
-                    if (editorId != null) {
+                    if (editorId != null && canManageEditors) {
                         IconButton(onClick = { viewModel.deleteEditor(editorId) }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Supprimer")
                         }
@@ -186,7 +189,7 @@ fun EditorDetailScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    enabled = !state.isSaving && name.isNotBlank()
+                    enabled = canManageEditors && !state.isSaving && name.isNotBlank()
                 ) {
                     if (state.isSaving) {
                         CircularProgressIndicator(

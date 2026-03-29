@@ -15,17 +15,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.GameWithEditor
+import com.example.myapplication.ui.viewmodel.AuthViewModel
 import com.example.myapplication.ui.viewmodel.GameViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameListScreen(
     viewModel: GameViewModel,
+    authViewModel: AuthViewModel,
     onGameClick: (Int) -> Unit,
     onCreateGame: () -> Unit,
     onBack: () -> Unit
 ) {
     val state by viewModel.listState.collectAsState()
+    val canManageGames = authViewModel.canManageFestivals()
 
     LaunchedEffect(Unit) {
         viewModel.loadGames()
@@ -46,8 +49,10 @@ fun GameListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onCreateGame) {
-                Icon(Icons.Filled.Add, contentDescription = "Créer un Jeu")
+            if (canManageGames) {
+                FloatingActionButton(onClick = onCreateGame) {
+                    Icon(Icons.Filled.Add, contentDescription = "Créer un Jeu")
+                }
             }
         }
     ) { padding ->

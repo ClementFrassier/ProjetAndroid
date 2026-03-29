@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.Reservation
+import com.example.myapplication.ui.viewmodel.AuthViewModel
 import com.example.myapplication.ui.viewmodel.ReservationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,11 +23,13 @@ import com.example.myapplication.ui.viewmodel.ReservationViewModel
 fun ReservationListScreen(
     festivalId: Int,
     viewModel: ReservationViewModel,
+    authViewModel: AuthViewModel,
     onReservationClick: (Int) -> Unit,
     onCreateReservation: () -> Unit,
     onBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+    val canManageReservations = authViewModel.canManageReservations()
 
     LaunchedEffect(festivalId) {
         viewModel.loadReservationsByFestival(festivalId)
@@ -47,8 +50,10 @@ fun ReservationListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onCreateReservation) {
-                Icon(Icons.Filled.Add, contentDescription = "Créer une réservation")
+            if (canManageReservations) {
+                FloatingActionButton(onClick = onCreateReservation) {
+                    Icon(Icons.Filled.Add, contentDescription = "Créer une réservation")
+                }
             }
         }
     ) { padding ->

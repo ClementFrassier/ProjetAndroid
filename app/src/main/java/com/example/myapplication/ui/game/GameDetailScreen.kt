@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.GameCreateInput
 import com.example.myapplication.model.GameInput
+import com.example.myapplication.ui.viewmodel.AuthViewModel
 import com.example.myapplication.ui.viewmodel.EditorViewModel
 import com.example.myapplication.ui.viewmodel.GameViewModel
 
@@ -22,11 +23,13 @@ import com.example.myapplication.ui.viewmodel.GameViewModel
 fun GameDetailScreen(
     gameId: Int?, 
     viewModel: GameViewModel,
+    authViewModel: AuthViewModel,
     editorViewModel: EditorViewModel,
     onBack: () -> Unit
 ) {
     val state by viewModel.detailState.collectAsState()
     val editorState by editorViewModel.listState.collectAsState()
+    val canManageGames = authViewModel.canManageFestivals()
     
     var name by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("") }
@@ -77,7 +80,7 @@ fun GameDetailScreen(
                     }
                 },
                 actions = {
-                    if (gameId != null) {
+                    if (gameId != null && canManageGames) {
                         IconButton(onClick = { viewModel.deleteGame(gameId) }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Supprimer")
                         }
@@ -210,7 +213,7 @@ fun GameDetailScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    enabled = !state.isSaving && name.isNotBlank() && (gameId != null || selectedEditorId != null)
+                    enabled = canManageGames && !state.isSaving && name.isNotBlank() && (gameId != null || selectedEditorId != null)
                 ) {
                     if (state.isSaving) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)

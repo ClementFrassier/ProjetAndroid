@@ -17,6 +17,11 @@ data class AuthUiState(
     val userRole: String? = null
 )
 
+private const val ROLE_SUPER_ADMIN = "super_admin"
+private const val ROLE_SUPER_ORGANISATEUR = "super_organisateur"
+private const val ROLE_ORGANISATEUR = "organisateur"
+private const val ROLE_BENEVOLE = "benevole"
+
 class AuthViewModel(
     private val repository: AuthRepository,
     private val authManager: AuthManager
@@ -65,6 +70,22 @@ class AuthViewModel(
     fun clearError() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
     }
+
+    fun hasAnyRole(vararg roles: String): Boolean {
+        val role = _uiState.value.userRole ?: return false
+        if (role == ROLE_SUPER_ADMIN) return true
+        return roles.contains(role)
+    }
+
+    fun canManageFestivals(): Boolean = hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR)
+
+    fun canManageReservations(): Boolean = hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR)
+
+    fun canManagePlacement(): Boolean =
+        hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR, ROLE_ORGANISATEUR)
+
+    fun canReadReservations(): Boolean =
+        hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR, ROLE_ORGANISATEUR, ROLE_BENEVOLE)
 
     class Factory(
         private val repository: AuthRepository,

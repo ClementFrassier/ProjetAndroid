@@ -15,17 +15,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.model.Editor
+import com.example.myapplication.ui.viewmodel.AuthViewModel
 import com.example.myapplication.ui.viewmodel.EditorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorListScreen(
     viewModel: EditorViewModel,
+    authViewModel: AuthViewModel,
     onEditorClick: (Int) -> Unit,
     onCreateEditor: () -> Unit,
     onBack: () -> Unit
 ) {
     val state by viewModel.listState.collectAsState()
+    val canManageEditors = authViewModel.canManageFestivals()
 
     LaunchedEffect(Unit) {
         viewModel.loadEditors()
@@ -46,8 +49,10 @@ fun EditorListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onCreateEditor) {
-                Icon(Icons.Filled.Add, contentDescription = "Créer un Éditeur")
+            if (canManageEditors) {
+                FloatingActionButton(onClick = onCreateEditor) {
+                    Icon(Icons.Filled.Add, contentDescription = "Créer un Éditeur")
+                }
             }
         }
     ) { padding ->

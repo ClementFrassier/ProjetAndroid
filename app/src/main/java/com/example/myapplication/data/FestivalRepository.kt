@@ -1,6 +1,7 @@
 package com.example.myapplication.data
 
 import com.example.myapplication.model.Festival
+import com.example.myapplication.model.Jeu
 import com.example.myapplication.network.ApiService
 
 class FestivalRepository(private val api: ApiService) {
@@ -25,6 +26,19 @@ class FestivalRepository(private val api: ApiService) {
                 val body = response.body()
                 if (body != null) Result.Success(body)
                 else Result.Error("Festival introuvable")
+            } else {
+                Result.Error("Erreur ${response.code()} : ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
+        }
+    }
+
+    suspend fun getFestivalGames(id: Int): Result<List<Jeu>> {
+        return try {
+            val response = api.getFestivalGames(id)
+            if (response.isSuccessful) {
+                Result.Success(response.body() ?: emptyList())
             } else {
                 Result.Error("Erreur ${response.code()} : ${response.message()}")
             }
