@@ -91,6 +91,30 @@ interface ApiService {
     @GET("api/zones-tarifaires")
     suspend fun getZonesTarifaires(): Response<List<TariffZone>>
 
+    @GET("api/zone-plans")
+    suspend fun getZonePlans(@Query("festival_id") festivalId: Int): Response<List<ZonePlan>>
+
+    @POST("api/zone-plans")
+    suspend fun createZonePlan(@Body input: ZonePlanInput): Response<ZonePlanResponse>
+
+    @PATCH("api/zone-plans/{id}")
+    suspend fun updateZonePlan(@Path("id") id: Int, @Body input: ZonePlanUpdateInput): Response<ZonePlanResponse>
+
+    @DELETE("api/zone-plans/{id}")
+    suspend fun deleteZonePlan(@Path("id") id: Int): Response<Map<String, String>>
+
+    @GET("api/jeu_festival")
+    suspend fun getReservationGamePlacements(@Query("reservation_id") reservationId: Int): Response<List<ReservationGamePlacement>>
+
+    @POST("api/jeu_festival")
+    suspend fun createReservationGamePlacement(@Body input: ReservationGamePlacementCreateInput): Response<ReservationGamePlacementResponse>
+
+    @PUT("api/jeu_festival/{id}")
+    suspend fun updateReservationGamePlacement(@Path("id") id: Int, @Body input: ReservationGamePlacementUpdateInput): Response<ReservationGamePlacementResponse>
+
+    @DELETE("api/jeu_festival/{id}")
+    suspend fun deleteReservationGamePlacement(@Path("id") id: Int): Response<Map<String, String>>
+
     // USERS
     @GET("api/users")
     suspend fun getUsers(): Response<List<User>>

@@ -11,7 +11,7 @@ class InvoiceRepository(private val api: ApiService) {
             when {
                 response.isSuccessful -> Result.Success(response.body())
                 response.code() == 404 -> Result.Success(null)
-                else -> Result.Error("Erreur ${response.code()} : ${response.message()}")
+                else -> Result.Error(response.toApiErrorMessage())
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
@@ -26,7 +26,7 @@ class InvoiceRepository(private val api: ApiService) {
                 if (body != null) Result.Success(body)
                 else Result.Error("Facture créée mais retour vide")
             } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+                Result.Error(response.toApiErrorMessage())
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
@@ -41,7 +41,7 @@ class InvoiceRepository(private val api: ApiService) {
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la mise à jour")
             } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+                Result.Error(response.toApiErrorMessage())
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")

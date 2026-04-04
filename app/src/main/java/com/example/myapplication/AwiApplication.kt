@@ -7,7 +7,9 @@ import com.example.myapplication.data.EditorRepository
 import com.example.myapplication.data.FestivalRepository
 import com.example.myapplication.data.GameRepository
 import com.example.myapplication.data.InvoiceRepository
+import com.example.myapplication.data.ReservationPlacementRepository
 import com.example.myapplication.data.ReservationRepository
+import com.example.myapplication.data.ZonePlanRepository
 import com.example.myapplication.network.ApiClient
 
 class AwiApplication : Application() {
@@ -33,6 +35,12 @@ class AwiApplication : Application() {
     lateinit var invoiceRepository: InvoiceRepository
         private set
 
+    lateinit var zonePlanRepository: ZonePlanRepository
+        private set
+
+    lateinit var reservationPlacementRepository: ReservationPlacementRepository
+        private set
+
     override fun onCreate() {
         super.onCreate()
         authManager = AuthManager(this)
@@ -43,5 +51,7 @@ class AwiApplication : Application() {
         gameRepository = GameRepository(apiService)
         reservationRepository = ReservationRepository(apiService)
         invoiceRepository = InvoiceRepository(apiService)
+        zonePlanRepository = ZonePlanRepository(apiService)
+        reservationPlacementRepository = ReservationPlacementRepository(apiService)
     }
 }

@@ -13,7 +13,7 @@ class ReservationRepository(private val api: ApiService) {
             if (response.isSuccessful) {
                 Result.Success(response.body() ?: emptyList())
             } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+                Result.Error(response.toApiErrorMessage())
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
@@ -28,7 +28,7 @@ class ReservationRepository(private val api: ApiService) {
                 if (body != null) Result.Success(body)
                 else Result.Error("Réservation introuvable")
             } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+                Result.Error(response.toApiErrorMessage())
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
@@ -43,7 +43,7 @@ class ReservationRepository(private val api: ApiService) {
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la création")
             } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+                Result.Error(response.toApiErrorMessage())
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
@@ -58,7 +58,7 @@ class ReservationRepository(private val api: ApiService) {
                 if (body != null) Result.Success(body)
                 else Result.Error("Erreur lors de la mise à jour")
             } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+                Result.Error(response.toApiErrorMessage())
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
@@ -71,7 +71,7 @@ class ReservationRepository(private val api: ApiService) {
             if (response.isSuccessful) {
                 Result.Success(Unit)
             } else {
-                Result.Error("Erreur ${response.code()} : ${response.message()}")
+                Result.Error(response.toApiErrorMessage())
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")

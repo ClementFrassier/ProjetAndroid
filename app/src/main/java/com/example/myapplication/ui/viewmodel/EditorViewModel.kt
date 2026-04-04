@@ -8,6 +8,7 @@ import com.example.myapplication.data.Result
 import com.example.myapplication.model.Editor
 import com.example.myapplication.model.EditorDetail
 import com.example.myapplication.model.EditorInput
+import com.example.myapplication.model.Game
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -26,6 +27,12 @@ data class EditorDetailUiState(
     val saveSuccess: Boolean = false
 )
 
+data class EditorGamesUiState(
+    val isLoading: Boolean = false,
+    val games: List<Game> = emptyList(),
+    val errorMessage: String? = null
+)
+
 class EditorViewModel(private val repository: EditorRepository) : ViewModel() {
 
     private val _listState = MutableStateFlow(EditorListUiState())
@@ -33,6 +40,9 @@ class EditorViewModel(private val repository: EditorRepository) : ViewModel() {
 
     private val _detailState = MutableStateFlow(EditorDetailUiState())
     val detailState: StateFlow<EditorDetailUiState> = _detailState
+
+    private val _gamesState = MutableStateFlow(EditorGamesUiState())
+    val gamesState: StateFlow<EditorGamesUiState> = _gamesState
 
     fun loadEditors() {
         viewModelScope.launch {
@@ -60,6 +70,16 @@ class EditorViewModel(private val repository: EditorRepository) : ViewModel() {
                     isLoading = false,
                     errorMessage = result.message
                 )
+            }
+        }
+    }
+
+    fun loadEditorGames(id: Int) {
+        viewModelScope.launch {
+            _gamesState.value = _gamesState.value.copy(isLoading = true, errorMessage = null)
+            when (val result = repository.getEditorGames(id)) {
+                is Result.Success -> _gamesState.value = EditorGamesUiState(games = result.data)
+                is Result.Error -> _gamesState.value = EditorGamesUiState(errorMessage = result.message)
             }
         }
     }
@@ -130,6 +150,7 @@ class EditorViewModel(private val repository: EditorRepository) : ViewModel() {
     
     fun resetDetailState() {
         _detailState.value = EditorDetailUiState()
+        _gamesState.value = EditorGamesUiState()
     }
 
     class Factory(private val repository: EditorRepository) : ViewModelProvider.Factory {
