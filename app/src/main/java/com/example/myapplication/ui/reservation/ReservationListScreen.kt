@@ -112,12 +112,20 @@ fun ReservationListScreen(
 
 @Composable
 private fun ReservationCard(reservation: Reservation, onClick: () -> Unit) {
-    val statusColor = when (reservation.workflowState) {
-        "PRESENT" -> MaterialTheme.colorScheme.primary
-        "FACTURE" -> MaterialTheme.colorScheme.tertiary
-        "FACTURE_PAYEE" -> MaterialTheme.colorScheme.secondary
-        "ANNULÉE" -> MaterialTheme.colorScheme.error
+    val normalizedStatus = reservation.workflowState.lowercase()
+    val statusColor = when (normalizedStatus) {
+        "present" -> MaterialTheme.colorScheme.primary
+        "facture" -> MaterialTheme.colorScheme.tertiary
+        "facture_payee" -> MaterialTheme.colorScheme.secondary
+        "annulée" -> MaterialTheme.colorScheme.error
         else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val statusLabel = when (normalizedStatus) {
+        "present" -> "PRESENT"
+        "facture" -> "FACTURE"
+        "facture_payee" -> "FACTURE PAYEE"
+        "annulée" -> "ANNULEE"
+        else -> reservation.workflowState.uppercase()
     }
 
     Card(
@@ -138,7 +146,7 @@ private fun ReservationCard(reservation: Reservation, onClick: () -> Unit) {
                 )
                 Badge(containerColor = statusColor) {
                     Text(
-                        reservation.workflowState,
+                        statusLabel,
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 11.sp,
                         modifier = Modifier.padding(horizontal = 4.dp)

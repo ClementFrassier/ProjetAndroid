@@ -23,17 +23,29 @@ class EditorRepository(private val api: ApiService) {
     suspend fun getEditorById(id: Int): Result<EditorDetail> {
         return try {
             val editorResponse = api.getEditorById(id)
+            if (!editorResponse.isSuccessful) {
+                return Result.Error(editorResponse.toApiErrorMessage())
+            }
+
+            val body = editorResponse.body() ?: return Result.Error("Éditeur introuvable")
             val gamesResponse = api.getEditorGames(id)
-            if (editorResponse.isSuccessful) {
-                val body = editorResponse.body()
-                if (body != null) {
-                    Result.Success(
-                        body.copy(games = gamesResponse.body().orEmpty())
-                    )
-                }
-                else Result.Error("Éditeur introuvable")
+            if (!gamesResponse.isSuccessful) {
+                Result.Error(gamesResponse.toApiErrorMessage("Impossible de charger les jeux de l'éditeur"))
             } else {
-                Result.Error("Erreur ${editorResponse.code()} : ${editorResponse.message()}")
+                Result.Success(body.copy(games = gamesResponse.body().orEmpty()))
+            }
+        } catch (e: Exception) {
+            Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
+        }
+    }
+
+    suspend fun getEditorGames(id: Int): Result<List<com.example.myapplication.model.Game>> {
+        return try {
+            val response = api.getEditorGames(id)
+            if (response.isSuccessful) {
+                Result.Success(response.body().orEmpty())
+            } else {
+                Result.Error(response.toApiErrorMessage("Impossible de charger les jeux de l'éditeur"))
             }
         } catch (e: Exception) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")

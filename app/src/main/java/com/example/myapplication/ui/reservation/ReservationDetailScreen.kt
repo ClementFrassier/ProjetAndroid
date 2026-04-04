@@ -32,6 +32,7 @@ fun ReservationDetailScreen(
     festivalViewModel: FestivalViewModel,
     editorViewModel: EditorViewModel,
     onManageInvoice: (Int) -> Unit,
+    onManagePlacement: (Int) -> Unit,
     onBack: () -> Unit
 ) {
     val state by viewModel.detailState.collectAsState()
@@ -45,6 +46,7 @@ fun ReservationDetailScreen(
     var willPresentGames by remember { mutableStateOf(true) }
     var powerOutlets by remember { mutableStateOf("0") }
     var gamesNotes by remember { mutableStateOf("") }
+    var localValidationMessage by remember { mutableStateOf<String?>(null) }
 
     // Map: TariffZoneId -> Tables count
     val zoneTablesMap = remember { mutableStateMapOf<Int, String>() }
@@ -68,6 +70,7 @@ fun ReservationDetailScreen(
         state.reservation?.let { res ->
             if (reservationId != null) {
                 // Initialiser le formulaire pour édition
+                zoneTablesMap.clear()
                 selectedEditorId = res.editorId
                 willPresentGames = res.willPresentGames
                 powerOutlets = res.powerOutlets.toString()
@@ -122,6 +125,12 @@ fun ReservationDetailScreen(
                 if (state.errorMessage != null) {
                     item {
                         Text("⚠️ ${state.errorMessage}", color = MaterialTheme.colorScheme.error)
+                    }
+                }
+
+                if (localValidationMessage != null) {
+                    item {
+                        Text("⚠️ $localValidationMessage", color = MaterialTheme.colorScheme.error)
                     }
                 }
 
@@ -236,20 +245,27 @@ fun ReservationDetailScreen(
                 item {
                     Button(
                         onClick = {
+                            localValidationMessage = null
                             val outlets = powerOutlets.toIntOrNull() ?: 0
                             val lines = zoneTablesMap.mapNotNull { (zoneId, tablesStr) ->
                                 val count = tablesStr.toIntOrNull() ?: 0
                                 if (count > 0) ReservationLineInput(tariffZoneId = zoneId, tablesCount = count) else null
                             }
 
+                            if (lines.isEmpty()) {
+                                localValidationMessage = "Sélectionne au moins une zone avec un nombre de tables."
+                                return@Button
+                            }
+
                             if (reservationId == null) {
-                                if (selectedEditorId != null && lines.isNotEmpty()) {
+                                if (selectedEditorId != null) {
                                     viewModel.createReservation(
                                         ReservationCreateInput(
                                             festivalId = festivalId,
                                             editorId = selectedEditorId,
                                             willPresentGames = willPresentGames,
                                             powerOutlets = outlets,
+                                            gamesNotes = gamesNotes.takeIf { it.isNotBlank() },
                                             lines = lines
                                         ),
                                         festivalId
@@ -261,9 +277,8 @@ fun ReservationDetailScreen(
                                     ReservationUpdateInput(
                                         willPresentGames = willPresentGames,
                                         powerOutlets = outlets,
-                                        gamesNotes = gamesNotes.takeIf { it.isNotBlank() }
-                                        // Note: Le backend exige de faire des modifications de lignes séparément dans un système complexe,
-                                        // Mais on a géré au moins le corps principal de la réservation
+                                        gamesNotes = gamesNotes.takeIf { it.isNotBlank() },
+                                        lines = lines
                                     ),
                                     festivalId
                                 )
@@ -287,6 +302,17 @@ fun ReservationDetailScreen(
                             modifier = Modifier.fillMaxWidth().height(48.dp)
                         ) {
                             Text("Gérer la facture")
+                        }
+                    }
+                }
+
+                if (reservationId != null && authViewModel.canManagePlacement()) {
+                    item {
+                        OutlinedButton(
+                            onClick = { onManagePlacement(reservationId) },
+                            modifier = Modifier.fillMaxWidth().height(48.dp)
+                        ) {
+                            Text("Jeux & placement")
                         }
                     }
                 }

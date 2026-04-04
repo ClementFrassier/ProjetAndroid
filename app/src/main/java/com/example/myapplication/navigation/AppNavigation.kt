@@ -13,6 +13,7 @@ import com.example.myapplication.ui.auth.LoginScreen
 import com.example.myapplication.ui.festival.FestivalDetailScreen
 import com.example.myapplication.ui.festival.FestivalListScreen
 import com.example.myapplication.ui.reservation.ReservationListScreen
+import com.example.myapplication.ui.reservation.ReservationPlacementScreen
 import com.example.myapplication.ui.viewmodel.AuthViewModel
 import com.example.myapplication.ui.viewmodel.FestivalViewModel
 import com.example.myapplication.ui.viewmodel.ReservationViewModel
@@ -25,6 +26,8 @@ import com.example.myapplication.ui.game.GameDetailScreen
 import com.example.myapplication.ui.reservation.ReservationDetailScreen
 import com.example.myapplication.ui.invoice.InvoiceDetailScreen
 import com.example.myapplication.ui.viewmodel.InvoiceViewModel
+import com.example.myapplication.ui.viewmodel.ReservationPlacementViewModel
+import com.example.myapplication.ui.viewmodel.ZonePlanViewModel
 
 object Routes {
     const val LOGIN = "login"
@@ -35,6 +38,7 @@ object Routes {
     const val RESERVATION_DETAIL = "reservations/{festivalId}/detail/{reservationId}"
     const val RESERVATION_CREATE = "reservations/{festivalId}/create"
     const val RESERVATION_INVOICE = "reservations/{reservationId}/invoice"
+    const val RESERVATION_PLACEMENT = "reservations/{festivalId}/placement/{reservationId}"
 
     const val EDITORS = "editors"
     const val EDITOR_DETAIL = "editors/{editorId}"
@@ -47,8 +51,8 @@ object Routes {
     fun reservations(festivalId: Int) = "reservations/$festivalId"
     fun reservationDetail(festivalId: Int, reservationId: Int) = "reservations/$festivalId/detail/$reservationId"
     fun reservationCreate(festivalId: Int) = "reservations/$festivalId/create"
-    
     fun reservationInvoice(reservationId: Int) = "reservations/$reservationId/invoice"
+    fun reservationPlacement(festivalId: Int, reservationId: Int) = "reservations/$festivalId/placement/$reservationId"
 
     fun editorDetail(id: Int) = "editors/$id"
     fun gameDetail(id: Int) = "games/$id"
@@ -75,6 +79,12 @@ fun AppNavigation(application: AwiApplication) {
     )
     val invoiceViewModel: InvoiceViewModel = viewModel(
         factory = InvoiceViewModel.Factory(application.invoiceRepository)
+    )
+    val zonePlanViewModel: ZonePlanViewModel = viewModel(
+        factory = ZonePlanViewModel.Factory(application.zonePlanRepository)
+    )
+    val reservationPlacementViewModel: ReservationPlacementViewModel = viewModel(
+        factory = ReservationPlacementViewModel.Factory(application.reservationPlacementRepository)
     )
 
     val startDestination = Routes.LOGIN
@@ -183,6 +193,9 @@ fun AppNavigation(application: AwiApplication) {
                 onManageInvoice = { id ->
                     navController.navigate(Routes.reservationInvoice(id))
                 },
+                onManagePlacement = { resId ->
+                    navController.navigate(Routes.reservationPlacement(festivalId, resId))
+                },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -200,6 +213,7 @@ fun AppNavigation(application: AwiApplication) {
                 festivalViewModel = festivalViewModel,
                 editorViewModel = editorViewModel,
                 onManageInvoice = {},
+                onManagePlacement = {},
                 onBack = { navController.popBackStack() }
             )
         }
@@ -212,6 +226,28 @@ fun AppNavigation(application: AwiApplication) {
             InvoiceDetailScreen(
                 reservationId = reservationId,
                 viewModel = invoiceViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Routes.RESERVATION_PLACEMENT,
+            arguments = listOf(
+                navArgument("festivalId") { type = NavType.IntType },
+                navArgument("reservationId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val festivalId = backStackEntry.arguments?.getInt("festivalId") ?: return@composable
+            val reservationId = backStackEntry.arguments?.getInt("reservationId") ?: return@composable
+            ReservationPlacementScreen(
+                festivalId = festivalId,
+                reservationId = reservationId,
+                reservationViewModel = reservationViewModel,
+                festivalViewModel = festivalViewModel,
+                editorViewModel = editorViewModel,
+                authViewModel = authViewModel,
+                zonePlanViewModel = zonePlanViewModel,
+                placementViewModel = reservationPlacementViewModel,
                 onBack = { navController.popBackStack() }
             )
         }

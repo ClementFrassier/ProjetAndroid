@@ -182,6 +182,70 @@ data class ReservationLineInput(
     @SerializedName("surface_m2") val surfaceM2: Double? = null
 )
 
+data class ZonePlan(
+    val id: Int,
+    @SerializedName("festival_id") val festivalId: Int,
+    @SerializedName("zone_tarifaire_id") val tariffZoneId: Int,
+    @SerializedName("nom") val name: String,
+    @SerializedName("nombre_tables") val tablesCount: Int
+)
+
+data class ZonePlanInput(
+    @SerializedName("festival_id") val festivalId: Int,
+    @SerializedName("zone_tarifaire_id") val tariffZoneId: Int,
+    @SerializedName("nom") val name: String,
+    @SerializedName("nombre_tables") val tablesCount: Int
+)
+
+data class ZonePlanUpdateInput(
+    @SerializedName("festival_id") val festivalId: Int? = null,
+    @SerializedName("zone_tarifaire_id") val tariffZoneId: Int? = null,
+    @SerializedName("nom") val name: String? = null,
+    @SerializedName("nombre_tables") val tablesCount: Int? = null
+)
+
+data class ReservationGamePlacement(
+    val id: Int,
+    @SerializedName("jeu_id") val gameId: Int,
+    @SerializedName("reservation_id") val reservationId: Int,
+    @SerializedName("zone_plan_id") val zonePlanId: Int? = null,
+    @SerializedName("quantite") val quantity: Int,
+    @SerializedName("nombre_tables_allouees") val allocatedTables: Int? = null,
+    @SerializedName("type_table") val tableType: String = "standard",
+    @SerializedName("tables_utilisees") val usedTables: Int = 0,
+    @SerializedName("liste_demandee") val requestedList: Boolean? = null,
+    @SerializedName("liste_obtenue") val obtainedList: Boolean? = null,
+    @SerializedName("jeux_recus") val receivedGames: Boolean? = null,
+    @SerializedName("nom_jeu") val gameName: String? = null,
+    @SerializedName("type_jeu") val gameType: String? = null,
+    @SerializedName("nom_zone") val zoneName: String? = null,
+    @SerializedName("festival_id") val festivalId: Int? = null
+)
+
+data class ReservationGamePlacementCreateInput(
+    @SerializedName("jeu_id") val gameId: Int,
+    @SerializedName("reservation_id") val reservationId: Int,
+    @SerializedName("zone_plan_id") val zonePlanId: Int? = null,
+    @SerializedName("quantite") val quantity: Int,
+    @SerializedName("nombre_tables_allouees") val allocatedTables: Int? = null,
+    @SerializedName("type_table") val tableType: String = "standard",
+    @SerializedName("tables_utilisees") val usedTables: Int,
+    @SerializedName("liste_demandee") val requestedList: Boolean = false,
+    @SerializedName("liste_obtenue") val obtainedList: Boolean = false,
+    @SerializedName("jeux_recus") val receivedGames: Boolean = false
+)
+
+data class ReservationGamePlacementUpdateInput(
+    @SerializedName("zone_plan_id") val zonePlanId: Int? = null,
+    @SerializedName("quantite") val quantity: Int? = null,
+    @SerializedName("nombre_tables_allouees") val allocatedTables: Int? = null,
+    @SerializedName("type_table") val tableType: String? = null,
+    @SerializedName("tables_utilisees") val usedTables: Int? = null,
+    @SerializedName("liste_demandee") val requestedList: Boolean? = null,
+    @SerializedName("liste_obtenue") val obtainedList: Boolean? = null,
+    @SerializedName("jeux_recus") val receivedGames: Boolean? = null
+)
+
 data class ReservationCreateInput(
     @SerializedName("festival_id") val festivalId: Int,
     @SerializedName("editeur_id") val editorId: Int? = null,
@@ -189,6 +253,7 @@ data class ReservationCreateInput(
     @SerializedName("prises_electriques") val powerOutlets: Int? = null,
     @SerializedName("remise_tables_offertes") val discountTables: Int? = null,
     @SerializedName("remise_argent") val discountAmount: Double? = null,
+    @SerializedName("notes") val gamesNotes: String? = null,
     @SerializedName("lignes") val lines: List<ReservationLineInput>
 )
 
@@ -198,7 +263,8 @@ data class ReservationUpdateInput(
     @SerializedName("remise_argent") val discountAmount: Double? = null,
     @SerializedName("prises_electriques") val powerOutlets: Int? = null,
     @SerializedName("notes") val gamesNotes: String? = null,
-    @SerializedName("statut_workflow") val workflowState: String? = null
+    @SerializedName("statut_workflow") val workflowState: String? = null,
+    @SerializedName("lignes") val lines: List<ReservationLineInput>? = null
 )
 
 data class FestivalLight(
@@ -239,6 +305,17 @@ data class GameResponse(
 data class ReservationResponse(
     val message: String,
     val reservation: Reservation
+)
+
+data class ZonePlanResponse(
+    val message: String,
+    @SerializedName("zone_plan") val zonePlan: ZonePlan
+)
+
+data class ReservationGamePlacementResponse(
+    val message: String,
+    @SerializedName("jeu_festival") val reservationGamePlacement: ReservationGamePlacement? = null,
+    @SerializedName("data") val updatedPlacement: ReservationGamePlacement? = null
 )
 
 // USERS
