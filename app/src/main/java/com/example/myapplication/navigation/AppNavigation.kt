@@ -28,6 +28,8 @@ import com.example.myapplication.ui.invoice.InvoiceDetailScreen
 import com.example.myapplication.ui.viewmodel.InvoiceViewModel
 import com.example.myapplication.ui.viewmodel.ReservationPlacementViewModel
 import com.example.myapplication.ui.viewmodel.ZonePlanViewModel
+import com.example.myapplication.ui.viewmodel.UserViewModel
+import com.example.myapplication.ui.user.UserListScreen
 
 object Routes {
     const val LOGIN = "login"
@@ -46,6 +48,7 @@ object Routes {
     const val GAMES = "games"
     const val GAME_DETAIL = "games/{gameId}"
     const val GAME_CREATE = "game_create"
+    const val USERS = "users"
 
     fun festivalDetail(id: Int) = "festivals/$id"
     fun reservations(festivalId: Int) = "reservations/$festivalId"
@@ -85,6 +88,9 @@ fun AppNavigation(application: AwiApplication) {
     )
     val reservationPlacementViewModel: ReservationPlacementViewModel = viewModel(
         factory = ReservationPlacementViewModel.Factory(application.reservationPlacementRepository)
+    )
+    val userViewModel: UserViewModel = viewModel(
+        factory = UserViewModel.Factory(application.userRepository)
     )
 
     val startDestination = Routes.LOGIN
@@ -130,6 +136,9 @@ fun AppNavigation(application: AwiApplication) {
                 },
                 onNavigateToCreateFestival = {
                     navController.navigate(Routes.FESTIVAL_CREATE)
+                },
+                onNavigateToUsers = {
+                    navController.navigate(Routes.USERS)
                 }
             )
         }
@@ -328,6 +337,14 @@ fun AppNavigation(application: AwiApplication) {
                 viewModel = gameViewModel,
                 authViewModel = authViewModel,
                 editorViewModel = editorViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.USERS) {
+            UserListScreen(
+                userViewModel = userViewModel,
+                authViewModel = authViewModel,
                 onBack = { navController.popBackStack() }
             )
         }
