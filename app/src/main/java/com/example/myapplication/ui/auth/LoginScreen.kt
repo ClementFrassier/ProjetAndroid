@@ -21,7 +21,8 @@ import com.example.myapplication.ui.viewmodel.AuthViewModel
 @Composable
 fun LoginScreen(
     viewModel: AuthViewModel,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onContinueWithoutLogin: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -127,7 +128,17 @@ fun LoginScreen(
                         Text("Se connecter", fontSize = 16.sp)
                     }
                 }
+
+                OutlinedButton(
+                    onClick = onContinueWithoutLogin,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text("Continuer sans se connecter", fontSize = 16.sp)
+                }
             }
         }
     }
 }
+

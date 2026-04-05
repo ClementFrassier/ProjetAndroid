@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,12 +30,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
@@ -58,6 +64,7 @@ fun FestivalDetailScreen(
     val authState by authViewModel.uiState.collectAsState()
     val canReadReservations = authViewModel.canReadReservations()
     val showManagementSections = authState.isLoggedIn
+    val canManageFestivals = authViewModel.canManageFestivals()
 
     LaunchedEffect(festivalId) {
         viewModel.loadFestival(festivalId)
@@ -71,6 +78,38 @@ fun FestivalDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour")
+                    }
+                },
+                actions = {
+                    if (canManageFestivals) {
+                        var showConfirmDialog by remember { mutableStateOf(false) }
+
+                        IconButton(onClick = { showConfirmDialog = true }) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Supprimer")
+                        }
+
+                        if (showConfirmDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showConfirmDialog = false },
+                                title = { Text("Confirmer la suppression") },
+                                text = { Text("Voulez-vous vraiment supprimer ce festival ? Cette action est irréversible.") },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            showConfirmDialog = false
+                                            viewModel.deleteFestival(festivalId, onSuccess = onBack)
+                                        }
+                                    ) {
+                                        Text("Supprimer", color = MaterialTheme.colorScheme.error)
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showConfirmDialog = false }) {
+                                        Text("Annuler")
+                                    }
+                                }
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

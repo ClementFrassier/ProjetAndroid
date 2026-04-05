@@ -86,6 +86,25 @@ class FestivalViewModel(private val repository: FestivalRepository) : ViewModel(
         }
     }
 
+    fun deleteFestival(id: Int, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _detailState.value = _detailState.value.copy(isLoading = true, errorMessage = null)
+            when (val result = repository.deleteFestival(id)) {
+                is Result.Success -> {
+                    _detailState.value = _detailState.value.copy(isLoading = false)
+                    loadFestivals() // Rafraîchir la liste
+                    onSuccess()
+                }
+                is Result.Error -> {
+                    _detailState.value = _detailState.value.copy(
+                        isLoading = false,
+                        errorMessage = result.message
+                    )
+                }
+            }
+        }
+    }
+
     class Factory(private val repository: FestivalRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")

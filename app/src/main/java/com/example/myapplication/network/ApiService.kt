@@ -26,6 +26,9 @@ interface ApiService {
     @POST("api/festivals")
     suspend fun createFestival(@Body request: CreateFestivalRequest): Response<FestivalResponse>
 
+    @DELETE("api/festivals/{id}")
+    suspend fun deleteFestival(@Path("id") id: Int): Response<Unit>
+
     @GET("api/festivals/{id}/games")
     suspend fun getFestivalGames(@Path("id") id: Int): Response<List<Jeu>>
 
@@ -63,7 +66,12 @@ interface ApiService {
 
     // GAMES
     @GET("api/jeux")
-    suspend fun getGames(@Query("editeur_id") editorId: Int? = null): Response<List<GameWithEditor>>
+    suspend fun getGames(
+        @Query("editeur_id") editorId: Int? = null,
+        @Query("q") q: String? = null,
+        @Query("type") type: String? = null,
+        @Query("sort") sort: String? = null
+    ): Response<List<GameWithEditor>>
 
     @GET("api/jeux/{id}")
     suspend fun getGameById(@Path("id") id: Int): Response<GameWithEditor>

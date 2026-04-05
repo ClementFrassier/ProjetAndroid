@@ -98,6 +98,11 @@ fun AppNavigation(application: AwiApplication) {
                     navController.navigate(Routes.FESTIVALS) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
+                },
+                onContinueWithoutLogin = {
+                    navController.navigate(Routes.FESTIVALS) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
                 }
             )
         }
@@ -292,6 +297,7 @@ fun AppNavigation(application: AwiApplication) {
             GameListScreen(
                 viewModel = gameViewModel,
                 authViewModel = authViewModel,
+                editorViewModel = editorViewModel,
                 onGameClick = { id ->
                     navController.navigate(Routes.gameDetail(id))
                 },

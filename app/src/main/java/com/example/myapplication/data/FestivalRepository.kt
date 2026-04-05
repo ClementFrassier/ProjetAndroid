@@ -61,4 +61,17 @@ class FestivalRepository(private val api: ApiService) {
             Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
         }
     }
+
+    suspend fun deleteFestival(id: Int): Result<Unit> {
+        return try {
+            val response = api.deleteFestival(id)
+            if (response.isSuccessful) {
+                Result.Success(Unit)
+            } else {
+                Result.Error("Erreur ${response.code()} : ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Result.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
+        }
+    }
 }

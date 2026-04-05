@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,8 +32,15 @@ fun EditorListScreen(
     val state by viewModel.listState.collectAsState()
     val canManageEditors = authViewModel.canManageFestivals()
 
+    var searchQuery by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit) {
         viewModel.loadEditors()
+    }
+
+    val filteredEditors = remember(state.editors, searchQuery) {
+        if (searchQuery.isBlank()) state.editors
+        else state.editors.filter { it.name.contains(searchQuery, ignoreCase = true) }
     }
 
     Scaffold(
@@ -56,47 +65,69 @@ fun EditorListScreen(
             }
         }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            when {
-                state.isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-                state.errorMessage != null -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            "⚠️ ${state.errorMessage}",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Button(onClick = { viewModel.loadEditors() }) {
-                            Text("Réessayer")
+            // Barre de recherche
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Rechercher un éditeur par nom...") },
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Rechercher") },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(Icons.Filled.Clear, contentDescription = "Effacer")
                         }
                     }
-                }
-                state.editors.isEmpty() -> {
-                    Text(
-                        "Aucun éditeur trouvé",
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                else -> {
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(state.editors) { editor ->
-                            EditorCard(
-                                editor = editor,
-                                onClick = { onEditorClick(editor.id) }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                singleLine = true
+            )
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                when {
+                    state.isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                    state.errorMessage != null -> {
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                "⚠️ ${state.errorMessage}",
+                                color = MaterialTheme.colorScheme.error
                             )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(onClick = { viewModel.loadEditors() }) {
+                                Text("Réessayer")
+                            }
+                        }
+                    }
+                    filteredEditors.isEmpty() -> {
+                        Text(
+                            if (searchQuery.isBlank()) "Aucun éditeur trouvé"
+                            else "Aucun éditeur correspondant à \"$searchQuery\"",
+                            modifier = Modifier.align(Alignment.Center),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    else -> {
+                        LazyColumn(
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(filteredEditors, key = { it.id }) { editor ->
+                                EditorCard(
+                                    editor = editor,
+                                    onClick = { onEditorClick(editor.id) }
+                                )
+                            }
                         }
                     }
                 }

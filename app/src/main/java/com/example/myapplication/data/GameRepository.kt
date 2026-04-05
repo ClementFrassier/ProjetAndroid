@@ -7,9 +7,14 @@ import com.example.myapplication.network.ApiService
 
 class GameRepository(private val api: ApiService) {
 
-    suspend fun getGames(editorId: Int? = null): Result<List<GameWithEditor>> {
+    suspend fun getGames(
+        editorId: Int? = null,
+        query: String? = null,
+        type: String? = null,
+        sort: String? = null
+    ): Result<List<GameWithEditor>> {
         return try {
-            val response = api.getGames(editorId)
+            val response = api.getGames(editorId, query, type, sort)
             if (response.isSuccessful) {
                 Result.Success(response.body() ?: emptyList())
             } else {

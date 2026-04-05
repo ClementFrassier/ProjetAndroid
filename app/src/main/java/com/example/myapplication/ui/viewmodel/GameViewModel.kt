@@ -34,10 +34,25 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
     private val _detailState = MutableStateFlow(GameDetailUiState())
     val detailState: StateFlow<GameDetailUiState> = _detailState
 
-    fun loadGames() {
+    private var currentEditorId: Int? = null
+    private var currentQuery: String? = null
+    private var currentType: String? = null
+    private var currentSort: String? = null
+
+    fun loadGames(
+        editorId: Int? = currentEditorId,
+        query: String? = currentQuery,
+        type: String? = currentType,
+        sort: String? = currentSort
+    ) {
+        currentEditorId = editorId
+        currentQuery = query
+        currentType = type
+        currentSort = sort
+
         viewModelScope.launch {
             _listState.value = _listState.value.copy(isLoading = true, errorMessage = null)
-            when (val result = repository.getGames()) {
+            when (val result = repository.getGames(currentEditorId, currentQuery, currentType, currentSort)) {
                 is Result.Success -> _listState.value = GameListUiState(games = result.data)
                 is Result.Error -> _listState.value = GameListUiState(errorMessage = result.message)
             }
