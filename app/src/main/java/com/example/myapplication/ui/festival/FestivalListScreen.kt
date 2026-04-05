@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +33,8 @@ fun FestivalListScreen(
     onLogin: () -> Unit,
     onNavigateToEditors: () -> Unit = {},
     onNavigateToGames: () -> Unit = {},
-    onNavigateToCreateFestival: () -> Unit = {}
+    onNavigateToCreateFestival: () -> Unit = {},
+    onNavigateToUsers: () -> Unit = {}
 ) {
     val state by festivalViewModel.listState.collectAsState()
     val authState by authViewModel.uiState.collectAsState()
@@ -59,6 +61,11 @@ fun FestivalListScreen(
                 },
                 actions = {
                     if (authState.isLoggedIn) {
+                        if (authState.userRole == "super_admin") {
+                            IconButton(onClick = onNavigateToUsers) {
+                                Icon(Icons.Filled.People, contentDescription = "Utilisateurs")
+                            }
+                        }
                         IconButton(onClick = onNavigateToGames) {
                             Icon(Icons.Filled.Casino, contentDescription = "Jeux")
                         }
