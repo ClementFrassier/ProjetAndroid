@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.app.Application
 import com.example.myapplication.data.AuthManager
 import com.example.myapplication.data.AuthRepository
+import com.example.myapplication.data.CrmRepository
 import com.example.myapplication.data.EditorRepository
 import com.example.myapplication.data.FestivalRepository
 import com.example.myapplication.data.GameRepository
@@ -36,6 +37,9 @@ class AwiApplication : Application() {
     lateinit var invoiceRepository: InvoiceRepository
         private set
 
+    lateinit var crmRepository: CrmRepository
+        private set
+
     lateinit var zonePlanRepository: ZonePlanRepository
         private set
 
@@ -55,6 +59,7 @@ class AwiApplication : Application() {
         gameRepository = GameRepository(apiService)
         reservationRepository = ReservationRepository(apiService)
         invoiceRepository = InvoiceRepository(apiService)
+        crmRepository = CrmRepository(apiService)
         zonePlanRepository = ZonePlanRepository(apiService)
         reservationPlacementRepository = ReservationPlacementRepository(apiService)
         userRepository = UserRepository(apiService)

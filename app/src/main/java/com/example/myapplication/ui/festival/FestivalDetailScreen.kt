@@ -58,7 +58,8 @@ fun FestivalDetailScreen(
     viewModel: FestivalViewModel,
     authViewModel: AuthViewModel,
     onBack: () -> Unit,
-    onViewReservations: (Int) -> Unit
+    onViewReservations: (Int) -> Unit,
+    onViewCrm: (Int) -> Unit
 ) {
     val state by viewModel.detailState.collectAsState()
     val authState by authViewModel.uiState.collectAsState()
@@ -276,6 +277,18 @@ fun FestivalDetailScreen(
                                         .height(50.dp)
                                 ) {
                                     Text("Voir les réservations")
+                                }
+                            }
+                            if (authViewModel.canManageReservations()) {
+                                item {
+                                    OutlinedButton(
+                                        onClick = { onViewCrm(festival.id) },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(50.dp)
+                                    ) {
+                                        Text("Suivi CRM")
+                                    }
                                 }
                             }
                         } else if (!authState.isLoggedIn) {

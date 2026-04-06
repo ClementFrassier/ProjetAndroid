@@ -10,11 +10,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myapplication.AwiApplication
 import com.example.myapplication.ui.auth.LoginScreen
+import com.example.myapplication.ui.crm.CrmScreen
 import com.example.myapplication.ui.festival.FestivalDetailScreen
 import com.example.myapplication.ui.festival.FestivalListScreen
 import com.example.myapplication.ui.reservation.ReservationListScreen
 import com.example.myapplication.ui.reservation.ReservationPlacementScreen
 import com.example.myapplication.ui.viewmodel.AuthViewModel
+import com.example.myapplication.ui.viewmodel.CrmViewModel
 import com.example.myapplication.ui.viewmodel.FestivalViewModel
 import com.example.myapplication.ui.viewmodel.ReservationViewModel
 import com.example.myapplication.ui.viewmodel.EditorViewModel
@@ -41,6 +43,7 @@ object Routes {
     const val RESERVATION_CREATE = "reservations/{festivalId}/create"
     const val RESERVATION_INVOICE = "reservations/{reservationId}/invoice"
     const val RESERVATION_PLACEMENT = "reservations/{festivalId}/placement/{reservationId}"
+    const val CRM = "crm/{festivalId}"
 
     const val EDITORS = "editors"
     const val EDITOR_DETAIL = "editors/{editorId}"
@@ -56,6 +59,7 @@ object Routes {
     fun reservationCreate(festivalId: Int) = "reservations/$festivalId/create"
     fun reservationInvoice(reservationId: Int) = "reservations/$reservationId/invoice"
     fun reservationPlacement(festivalId: Int, reservationId: Int) = "reservations/$festivalId/placement/$reservationId"
+    fun crm(festivalId: Int) = "crm/$festivalId"
 
     fun editorDetail(id: Int) = "editors/$id"
     fun gameDetail(id: Int) = "games/$id"
@@ -82,6 +86,9 @@ fun AppNavigation(application: AwiApplication) {
     )
     val invoiceViewModel: InvoiceViewModel = viewModel(
         factory = InvoiceViewModel.Factory(application.invoiceRepository)
+    )
+    val crmViewModel: CrmViewModel = viewModel(
+        factory = CrmViewModel.Factory(application.crmRepository)
     )
     val zonePlanViewModel: ZonePlanViewModel = viewModel(
         factory = ZonePlanViewModel.Factory(application.zonePlanRepository)
@@ -155,6 +162,9 @@ fun AppNavigation(application: AwiApplication) {
                 onBack = { navController.popBackStack() },
                 onViewReservations = { id ->
                     navController.navigate(Routes.reservations(id))
+                },
+                onViewCrm = { id ->
+                    navController.navigate(Routes.crm(id))
                 }
             )
         }
@@ -228,6 +238,19 @@ fun AppNavigation(application: AwiApplication) {
                 editorViewModel = editorViewModel,
                 onManageInvoice = {},
                 onManagePlacement = {},
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Routes.CRM,
+            arguments = listOf(navArgument("festivalId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val festivalId = backStackEntry.arguments?.getInt("festivalId") ?: return@composable
+            CrmScreen(
+                festivalId = festivalId,
+                authViewModel = authViewModel,
+                viewModel = crmViewModel,
                 onBack = { navController.popBackStack() }
             )
         }

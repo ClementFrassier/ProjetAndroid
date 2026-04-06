@@ -123,6 +123,22 @@ interface ApiService {
     @DELETE("api/jeu_festival/{id}")
     suspend fun deleteReservationGamePlacement(@Path("id") id: Int): Response<Map<String, String>>
 
+    // CRM
+    @GET("api/crm")
+    suspend fun getCrmRows(@Query("festival_id") festivalId: Int): Response<List<CrmRow>>
+
+    @POST("api/crm")
+    suspend fun upsertCrmStatus(@Body input: CrmUpsertInput): Response<Map<String, String>>
+
+    @POST("api/contact_editeur")
+    suspend fun createCrmContact(@Body input: CrmContactCreateInput): Response<Map<String, String>>
+
+    @GET("api/contact_editeur")
+    suspend fun getCrmContacts(
+        @Query("editeur_id") editorId: Int,
+        @Query("festival_id") festivalId: Int
+    ): Response<List<CrmFollowUp>>
+
     // USERS
     @GET("api/users")
     suspend fun getUsers(): Response<List<User>>

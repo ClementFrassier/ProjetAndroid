@@ -22,8 +22,6 @@ object ApiClient {
 
 
 
-
-
     private fun getUnsafeTrustManager(): X509TrustManager {
         return object : X509TrustManager {
             override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
