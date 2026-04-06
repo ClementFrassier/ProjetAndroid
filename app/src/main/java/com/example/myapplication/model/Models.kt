@@ -318,6 +318,42 @@ data class ReservationGamePlacementResponse(
     @SerializedName("data") val updatedPlacement: ReservationGamePlacement? = null
 )
 
+data class CrmRow(
+    @SerializedName("editeur_id") val editorId: Int,
+    @SerializedName("editeur_nom") val editorName: String,
+    @SerializedName("type_reservant") val reservantType: String? = null,
+    @SerializedName("est_reservant") val isReservant: Boolean? = null,
+    @SerializedName("statut") val status: String? = null,
+    @SerializedName("derniere_relance") val lastFollowUp: String? = null,
+    @SerializedName("notes") val notes: String? = null,
+    @SerializedName("total_contacts") val totalContacts: Int? = null,
+    @SerializedName("last_contact") val lastContact: String? = null
+)
+
+data class CrmUpsertInput(
+    @SerializedName("editeur_id") val editorId: Int,
+    @SerializedName("festival_id") val festivalId: Int,
+    @SerializedName("statut") val status: String? = null,
+    @SerializedName("notes") val notes: String? = null
+)
+
+data class CrmFollowUp(
+    val id: Int,
+    @SerializedName("editeur_id") val editorId: Int,
+    @SerializedName("festival_id") val festivalId: Int,
+    @SerializedName("date_contact") val contactDate: String,
+    @SerializedName("type_contact") val contactType: String? = null,
+    @SerializedName("notes") val notes: String? = null,
+    @SerializedName("nom_editeur") val editorName: String? = null
+)
+
+data class CrmContactCreateInput(
+    @SerializedName("editeur_id") val editorId: Int,
+    @SerializedName("festival_id") val festivalId: Int,
+    @SerializedName("notes") val notes: String? = null,
+    @SerializedName("type_contact") val contactType: String? = null
+)
+
 // USERS
 data class User(
     val id: Int,
