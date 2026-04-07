@@ -1,6 +1,7 @@
 package com.example.myapplication.network
 
 import com.example.myapplication.model.*
+import com.google.gson.JsonObject
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -11,7 +12,7 @@ interface ApiService {
     suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
 
     @POST("api/auth/logout")
-    suspend fun logout(): Response<Map<String, String>>
+    suspend fun logout(): Response<JsonObject>
 
     @GET("api/auth/whoami")
     suspend fun whoami(): Response<AuthResponse>
@@ -109,7 +110,7 @@ interface ApiService {
     suspend fun updateZonePlan(@Path("id") id: Int, @Body input: ZonePlanUpdateInput): Response<ZonePlanResponse>
 
     @DELETE("api/zone-plans/{id}")
-    suspend fun deleteZonePlan(@Path("id") id: Int): Response<Map<String, String>>
+    suspend fun deleteZonePlan(@Path("id") id: Int): Response<JsonObject>
 
     @GET("api/jeu_festival")
     suspend fun getReservationGamePlacements(@Query("reservation_id") reservationId: Int): Response<List<ReservationGamePlacement>>
@@ -121,17 +122,17 @@ interface ApiService {
     suspend fun updateReservationGamePlacement(@Path("id") id: Int, @Body input: ReservationGamePlacementUpdateInput): Response<ReservationGamePlacementResponse>
 
     @DELETE("api/jeu_festival/{id}")
-    suspend fun deleteReservationGamePlacement(@Path("id") id: Int): Response<Map<String, String>>
+    suspend fun deleteReservationGamePlacement(@Path("id") id: Int): Response<JsonObject>
 
     // CRM
     @GET("api/crm")
     suspend fun getCrmRows(@Query("festival_id") festivalId: Int): Response<List<CrmRow>>
 
     @POST("api/crm")
-    suspend fun upsertCrmStatus(@Body input: CrmUpsertInput): Response<Map<String, String>>
+    suspend fun upsertCrmStatus(@Body input: CrmUpsertInput): Response<JsonObject>
 
     @POST("api/contact_editeur")
-    suspend fun createCrmContact(@Body input: CrmContactCreateInput): Response<Map<String, String>>
+    suspend fun createCrmContact(@Body input: CrmContactCreateInput): Response<JsonObject>
 
     @GET("api/contact_editeur")
     suspend fun getCrmContacts(

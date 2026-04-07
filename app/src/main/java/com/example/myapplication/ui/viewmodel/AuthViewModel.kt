@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.AuthManager
 import com.example.myapplication.data.AuthRepository
+import com.example.myapplication.data.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -43,14 +44,14 @@ class AuthViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             val result = repository.login(login, password)
             when (result) {
-                is com.example.myapplication.data.Result.Success -> {
+                is Result.Success -> {
                     _uiState.value = AuthUiState(
                         isLoggedIn = true,
                         userLogin = authManager.getLogin(),
                         userRole = authManager.getRole()
                     )
                 }
-                is com.example.myapplication.data.Result.Error -> {
+                is Result.Error -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = result.message
