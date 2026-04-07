@@ -60,6 +60,8 @@ fun MyApplicationTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    // On fige volontairement la palette pour garder la meme identite visuelle
+    // sur tous les appareils, meme quand Android propose des couleurs dynamiques.
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(

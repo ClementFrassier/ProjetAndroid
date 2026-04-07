@@ -94,6 +94,8 @@ fun ReservationPlacementScreen(
     var receivedGames by remember { mutableStateOf(false) }
     var localMessage by remember { mutableStateOf<String?>(null) }
 
+    // On arrive ici depuis une reservation, donc on recharge tout ce qui sert
+    // au placement en une seule fois pour avoir un ecran directement exploitable.
     LaunchedEffect(festivalId, reservationId) {
         reservationViewModel.loadReservation(reservationId)
         festivalViewModel.loadFestival(festivalId)
@@ -101,6 +103,8 @@ fun ReservationPlacementScreen(
         placementViewModel.loadByReservation(reservationId)
     }
 
+    // Le placement doit rester centre sur l'editeur de la reservation :
+    // on ne propose pas des jeux pris ailleurs dans le catalogue.
     LaunchedEffect(reservationState.reservation?.editorId) {
         reservationState.reservation?.editorId?.let { editorViewModel.loadEditorGames(it) }
     }
@@ -108,6 +112,7 @@ fun ReservationPlacementScreen(
     val reservation = reservationState.reservation
     val festival = festivalState.festival
     val availableGames = editorGamesState.games
+    // On garde seulement les zones de plan compatibles avec ce qui a ete reserve.
     val eligibleZones = remember(reservation, zonePlanState.zones) {
         computeEligibleZones(reservation, zonePlanState.zones)
     }
@@ -227,6 +232,8 @@ fun ReservationPlacementScreen(
                             Button(
                                 onClick = {
                                     localMessage = null
+                                    // Une zone de plan reste toujours rattachee a une vraie zone tarifaire
+                                    // du festival. Ca evite de construire un plan incoherent.
                                     val tariffZoneId = selectedTariffZoneId
                                     val tables = zoneTablesCount.toIntOrNull() ?: 0
                                     val maxTables = festival?.tariffZones?.find { it.id == tariffZoneId }?.totalTables
@@ -346,6 +353,8 @@ fun ReservationPlacementScreen(
                                 Button(
                                     onClick = {
                                         localMessage = null
+                                        // Ici, on construit le payload attendu par le backend pour un
+                                        // vrai placement de jeu rattache a la reservation courante.
                                         val gameId = selectedGameId
                                         val qty = quantity.toIntOrNull() ?: 0
                                         val tables = usedTables.toIntOrNull() ?: 0
