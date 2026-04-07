@@ -220,6 +220,8 @@ fun ReservationDetailScreen(
                     item { Text("Aucune zone tarifaire définie pour ce festival") }
                 } else {
                     items(zones) { zone ->
+                        val currentTables = zoneTablesMap[zone.id]?.toIntOrNull() ?: 0
+                        val exceeds = currentTables > zone.totalTables
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth(),
@@ -227,14 +229,34 @@ fun ReservationDetailScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(zone.name, fontWeight = FontWeight.SemiBold)
-                                Text("${zone.pricePerTable}€ / table", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    "${zone.pricePerTable}€/table · max ${zone.totalTables} tables",
+                                    fontSize = 12.sp,
+                                    color = if (exceeds) MaterialTheme.colorScheme.error
+                                            else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                             OutlinedTextField(
                                 value = zoneTablesMap[zone.id] ?: "0",
-                                onValueChange = { zoneTablesMap[zone.id] = it.filter { char -> char.isDigit() }.take(3) },
+                                onValueChange = { v ->
+                                    val n = v.filter { it.isDigit() }.take(3)
+                                    zoneTablesMap[zone.id] = n
+                                },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.width(80.dp),
-                                singleLine = true
+                                singleLine = true,
+                                isError = exceeds,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = if (exceeds) MaterialTheme.colorScheme.error
+                                                         else MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                        if (exceeds) {
+                            Text(
+                                "⚠ Maximum ${zone.totalTables} tables pour cette zone",
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp
                             )
                         }
                     }
@@ -247,6 +269,19 @@ fun ReservationDetailScreen(
                         onClick = {
                             localValidationMessage = null
                             val outlets = powerOutlets.toIntOrNull() ?: 0
+                            val zones = festivalState.festival?.tariffZones ?: emptyList()
+
+                            // Vérification : aucune zone ne dépasse son nombre max de tables
+                            val overflowZone = zones.firstOrNull { zone ->
+                                val requested = zoneTablesMap[zone.id]?.toIntOrNull() ?: 0
+                                requested > zone.totalTables
+                            }
+                            if (overflowZone != null) {
+                                val requested = zoneTablesMap[overflowZone.id]?.toIntOrNull() ?: 0
+                                localValidationMessage = "Zone \"${overflowZone.name}\" : $requested tables demandées mais maximum ${overflowZone.totalTables} disponibles."
+                                return@Button
+                            }
+
                             val lines = zoneTablesMap.mapNotNull { (zoneId, tablesStr) ->
                                 val count = tablesStr.toIntOrNull() ?: 0
                                 if (count > 0) ReservationLineInput(tariffZoneId = zoneId, tablesCount = count) else null
@@ -285,7 +320,11 @@ fun ReservationDetailScreen(
                             }
                     },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    enabled = canManageReservations && !state.isSaving && (selectedEditorId != null || reservationId != null)
+                    enabled = canManageReservations && !state.isSaving &&
+                        (selectedEditorId != null || reservationId != null) &&
+                        (festivalState.festival?.tariffZones?.none { zone ->
+                            (zoneTablesMap[zone.id]?.toIntOrNull() ?: 0) > zone.totalTables
+                        } != false)
                 ) {
                         if (state.isSaving) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)

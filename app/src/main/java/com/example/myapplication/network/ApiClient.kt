@@ -18,7 +18,7 @@ object ApiClient {
 
     // L'émulateur Android utilise 10.0.2.2 pour accéder à localhost du PC
     // Sur téléphone physique connecté au réseau local (Wi-Fi), il faut utiliser l'IP locale du PC
-    private const val BASE_URL = "https://192.168.1.78:4000/"
+    private const val BASE_URL = "https://192.168.1.78:4001/"
 
 
 

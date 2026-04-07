@@ -152,7 +152,7 @@ fun UserListScreen(
         AlertDialog(
             onDismissRequest = { deletingUser = null },
             title = { Text("Supprimer l'utilisateur") },
-            text = { Text("Êtes-vous sûr de vouloir supprimer l'utilisateur ${user.email} ?") },
+            text = { Text("Êtes-vous sûr de vouloir supprimer l'utilisateur ${user.login} ?") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -186,13 +186,9 @@ fun UserCard(user: User, onEditRole: () -> Unit, onDelete: () -> Unit) {
             Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = user.email, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = user.login, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(4.dp))
                 AssistChip(onClick = {}, label = { Text(user.role) })
-                Spacer(modifier = Modifier.height(4.dp))
-                // Safely format date or just fallback to the string if shorter than 10
-                val dateStr = if (user.createdAt.length >= 10) user.createdAt.take(10) else user.createdAt
-                Text(text = "Créé le : \$dateStr", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Row {
                 IconButton(onClick = onEditRole) {
@@ -225,7 +221,7 @@ fun CreateUserDialog(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email") },
+                    label = { Text("Identifiant (login)") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -287,7 +283,7 @@ fun EditUserRoleDialog(
         title = { Text("Modifier le Rôle") },
         text = {
             Column {
-                Text("Utilisateur : ${user.email}", fontWeight = FontWeight.Bold)
+                Text("Utilisateur : ${user.login}", fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
                 roles.forEach { r ->
                     Row(

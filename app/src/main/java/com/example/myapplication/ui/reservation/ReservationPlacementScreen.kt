@@ -203,18 +203,37 @@ fun ReservationPlacementScreen(
                             OutlinedTextField(
                                 value = zoneTablesCount,
                                 onValueChange = { zoneTablesCount = it.filter(Char::isDigit) },
-                                label = { Text("Nombre de tables") },
+                                label = {
+                                    val maxTables = festival?.tariffZones?.find { it.id == selectedTariffZoneId }?.totalTables
+                                    Text(if (maxTables != null) "Nbre de tables (max $maxTables)" else "Nombre de tables")
+                                },
+                                isError = run {
+                                    val max = festival?.tariffZones?.find { it.id == selectedTariffZoneId }?.totalTables
+                                    max != null && (zoneTablesCount.toIntOrNull() ?: 0) > max
+                                },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth()
                             )
+                            val zoneTables = zoneTablesCount.toIntOrNull() ?: 0
+                            val maxTables = festival?.tariffZones?.find { it.id == selectedTariffZoneId }?.totalTables
+                            if (maxTables != null && zoneTables > maxTables) {
+                                Text(
+                                    "⚠ Maximum $maxTables tables pour cette zone tarifaire",
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 12.sp
+                                )
+                            }
                             Spacer(modifier = Modifier.height(8.dp))
                             Button(
                                 onClick = {
                                     localMessage = null
                                     val tariffZoneId = selectedTariffZoneId
                                     val tables = zoneTablesCount.toIntOrNull() ?: 0
+                                    val maxTables = festival?.tariffZones?.find { it.id == tariffZoneId }?.totalTables
                                     if (tariffZoneId == null || zoneName.isBlank() || tables <= 0) {
                                         localMessage = "Complète le nom, la zone tarifaire et le nombre de tables."
+                                    } else if (maxTables != null && tables > maxTables) {
+                                        localMessage = "Cette zone tarifaire autorise maximum $maxTables tables."
                                     } else {
                                         zonePlanViewModel.create(
                                             ZonePlanInput(

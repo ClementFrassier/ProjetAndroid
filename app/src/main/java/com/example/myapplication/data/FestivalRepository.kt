@@ -1,5 +1,6 @@
 package com.example.myapplication.data
 
+import com.example.myapplication.model.CreateFestivalRequest
 import com.example.myapplication.model.Festival
 import com.example.myapplication.model.Jeu
 import com.example.myapplication.network.ApiService
@@ -47,7 +48,7 @@ class FestivalRepository(private val api: ApiService) {
         }
     }
 
-    suspend fun createFestival(request: com.example.myapplication.model.CreateFestivalRequest): Result<Festival> {
+    suspend fun createFestival(request: CreateFestivalRequest): Result<Festival> {
         return try {
             val response = api.createFestival(request)
             if (response.isSuccessful) {
