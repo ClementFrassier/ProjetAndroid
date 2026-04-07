@@ -72,12 +72,16 @@ class AuthViewModel(
         _uiState.value = _uiState.value.copy(errorMessage = null)
     }
 
+    // Toute l'UI s'appuie sur ce point d'entrée pour savoir quoi afficher.
+    // Le super admin reste volontairement "au-dessus" des autres rôles.
     fun hasAnyRole(vararg roles: String): Boolean {
         val role = _uiState.value.userRole ?: return false
         if (role == ROLE_SUPER_ADMIN) return true
         return roles.contains(role)
     }
 
+    // Côté mobile, on garde des helpers lisibles plutôt que de refaire les tests
+    // de rôles dans chaque écran.
     fun canManageFestivals(): Boolean = hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR)
 
     /** Alias sémantique — même droits que canManageFestivals */
@@ -88,7 +92,9 @@ class AuthViewModel(
 
     fun canReadReservations(): Boolean =
         hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR, ROLE_ORGANISATEUR, ROLE_BENEVOLE)
-
+    
+    //class factory ou companion object ? Factory car j'ai besoin d'instancier avec des parametres(repository et manager)
+    //alors que companion object represente du statique
     class Factory(
         private val repository: AuthRepository,
         private val authManager: AuthManager

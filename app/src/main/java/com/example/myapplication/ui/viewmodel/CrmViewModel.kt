@@ -28,6 +28,8 @@ class CrmViewModel(private val repository: CrmRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(CrmUiState())
     val uiState: StateFlow<CrmUiState> = _uiState
 
+    // Le CRM se lit toujours a l'echelle d'un festival :
+    // on recharge donc toute la table de suivi en une fois.
     fun loadFestivalCrm(festivalId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
@@ -48,6 +50,8 @@ class CrmViewModel(private val repository: CrmRepository) : ViewModel() {
         }
     }
 
+    // Un changement de statut repasse par l'API CRM existante, puis on recharge
+    // la liste pour rester colle a l'etat reel du backend.
     fun updateStatus(editorId: Int, festivalId: Int, status: String, notes: String? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, saveErrorMessage = null)
@@ -77,6 +81,8 @@ class CrmViewModel(private val repository: CrmRepository) : ViewModel() {
         updateStatus(editorId, festivalId, currentStatus ?: "pas_de_contact", notes)
     }
 
+    // Quand on ajoute un contact, on suit la logique du projet web :
+    // le simple fait d'avoir pris contact fait basculer le statut en "contact_pris".
     fun addContact(editorId: Int, festivalId: Int, contactType: String?, notes: String?) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, saveErrorMessage = null)
@@ -99,6 +105,8 @@ class CrmViewModel(private val repository: CrmRepository) : ViewModel() {
         }
     }
 
+    // L'historique des contacts est charge editeur par editeur pour eviter
+    // de charger tout le monde d'un coup a l'ouverture de l'ecran.
     fun loadContacts(editorId: Int, festivalId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
