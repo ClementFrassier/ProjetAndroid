@@ -48,7 +48,12 @@ data class CreateFestivalRequest(
     @SerializedName("date_debut") val dateDebut: String,
     @SerializedName("date_fin") val dateFin: String,
     val description: String?,
-    @SerializedName("nombre_total_tables") val nombreTotalTables: Int
+    @SerializedName("nombre_total_tables") val nombreTotalTables: Int,
+    @SerializedName("stock_tables_standard") val stockTablesStandard: Int = 0,
+    @SerializedName("stock_tables_grandes") val stockTablesGrandes: Int = 0,
+    @SerializedName("stock_tables_mairie") val stockTablesMairie: Int = 0,
+    @SerializedName("stock_chaises") val stockChaises: Int = 0,
+    val zones: List<ZoneTarifaireInput> = emptyList()
 )
 
 data class EditeurLight(
@@ -357,17 +362,24 @@ data class CrmContactCreateInput(
 // USERS
 data class User(
     val id: Int,
-    val email: String,
-    val role: String,
-    val createdAt: String
+    val login: String,
+    val role: String
 )
 
 data class CreateUserInput(
-    val email: String,
+    val login: String,
     val password: String,
     val role: String
 )
 
 data class UpdateUserRoleInput(
     val role: String
+)
+
+// Zone tarifaire pour la création de festival
+data class ZoneTarifaireInput(
+    @SerializedName("nom") val nom: String,
+    @SerializedName("nombre_tables") val nombreTables: Int,
+    @SerializedName("prix_table") val prixTable: Double,
+    @SerializedName("prix_m2") val prixM2: Double
 )

@@ -79,7 +79,8 @@ class AuthViewModel(
 
     fun canManageFestivals(): Boolean = hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR)
 
-    fun canManageReservations(): Boolean = hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR)
+    /** Alias sémantique — même droits que canManageFestivals */
+    fun canManageReservations(): Boolean = canManageFestivals()
 
     fun canManagePlacement(): Boolean =
         hasAnyRole(ROLE_SUPER_ADMIN, ROLE_SUPER_ORGANISATEUR, ROLE_ORGANISATEUR)

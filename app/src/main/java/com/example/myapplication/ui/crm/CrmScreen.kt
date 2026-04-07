@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -83,6 +85,7 @@ fun CrmScreen(
     val contactTypeDrafts = remember { mutableStateMapOf<Int, String>() }
     val contactNotesDrafts = remember { mutableStateMapOf<Int, String>() }
     val historyOpen = remember { mutableStateMapOf<Int, Boolean>() }
+    var searchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(festivalId) {
         viewModel.loadFestivalCrm(festivalId)
@@ -141,32 +144,66 @@ fun CrmScreen(
             }
 
             else -> {
-                LazyColumn(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    state.errorMessage?.let { message ->
-                        item {
-                            Text("⚠️ $message", color = MaterialTheme.colorScheme.error)
-                        }
-                    }
-                    state.saveErrorMessage?.let { message ->
-                        item {
-                            Text("⚠️ $message", color = MaterialTheme.colorScheme.error)
+                    // Barre de recherche
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { Text("Rechercher un éditeur...") },
+                        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Filled.Clear, contentDescription = "Effacer")
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        singleLine = true
+                    )
+
+                    val filteredRows = remember(state.rows, searchQuery) {
+                        if (searchQuery.isBlank()) state.rows
+                        else state.rows.filter {
+                            it.editorName.contains(searchQuery, ignoreCase = true)
                         }
                     }
 
-                    item {
-                        Text(
-                            "${state.rows.size} éditeur(s) suivis",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        state.errorMessage?.let { message ->
+                            item { Text("⚠️ $message", color = MaterialTheme.colorScheme.error) }
+                        }
+                        state.saveErrorMessage?.let { message ->
+                            item { Text("⚠️ $message", color = MaterialTheme.colorScheme.error) }
+                        }
 
-                    items(state.rows, key = { it.editorId }) { row ->
+                        item {
+                            Text(
+                                "${filteredRows.size} / ${state.rows.size} éditeur(s) affiché(s)",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        if (filteredRows.isEmpty() && searchQuery.isNotBlank()) {
+                            item {
+                                Text(
+                                    "Aucun éditeur correspondant à \"$searchQuery\"",
+                                    modifier = Modifier.padding(16.dp),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        items(filteredRows, key = { it.editorId }) { row ->
                         CrmRowCard(
                             row = row,
                             notesDraft = notesDrafts[row.editorId].orEmpty(),
@@ -207,6 +244,7 @@ fun CrmScreen(
                                 }
                             }
                         )
+                        }
                     }
                 }
             }
