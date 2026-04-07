@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.festival
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -43,6 +45,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,9 +76,10 @@ fun FestivalDetailScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(state.festival?.name ?: "Festival") },
+                title = { Text(state.festival?.name ?: "Festival", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour")
@@ -114,7 +118,7 @@ fun FestivalDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -122,6 +126,15 @@ fun FestivalDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+                            MaterialTheme.colorScheme.background
+                        )
+                    )
+                )
                 .padding(padding)
         ) {
             when {
@@ -146,13 +159,18 @@ fun FestivalDetailScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         item {
-                            Card(modifier = Modifier.fillMaxWidth()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(28.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(
                                         festival.name,
-                                        fontSize = 22.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
+                                        style = MaterialTheme.typography.displayMedium,
+                                        color = MaterialTheme.colorScheme.onPrimary
                                     )
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -160,10 +178,10 @@ fun FestivalDetailScreen(
                                             Icons.Filled.LocationOn,
                                             null,
                                             modifier = Modifier.size(18.dp),
-                                            tint = MaterialTheme.colorScheme.secondary
+                                            tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.78f)
                                         )
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text(festival.location)
+                                        Text(festival.location, color = MaterialTheme.colorScheme.onPrimary)
                                     }
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -171,18 +189,24 @@ fun FestivalDetailScreen(
                                             Icons.Filled.CalendarMonth,
                                             null,
                                             modifier = Modifier.size(18.dp),
-                                            tint = MaterialTheme.colorScheme.secondary
+                                            tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.78f)
                                         )
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("${festival.dateDebut.take(10)} → ${festival.dateFin.take(10)}")
+                                        Text(
+                                            "${festival.dateDebut.take(10)} → ${festival.dateFin.take(10)}",
+                                            color = MaterialTheme.colorScheme.onPrimary
+                                        )
                                     }
                                     if (!festival.description.isNullOrBlank()) {
                                         Spacer(modifier = Modifier.height(10.dp))
-                                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                                        HorizontalDivider(
+                                            modifier = Modifier.padding(vertical = 8.dp),
+                                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.16f)
+                                        )
                                         Text(
                                             festival.description,
                                             fontSize = 14.sp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.86f)
                                         )
                                     }
                                 }
@@ -197,6 +221,7 @@ fun FestivalDetailScreen(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(top = 8.dp),
+                                            shape = RoundedCornerShape(18.dp),
                                             colors = CardDefaults.cardColors(
                                                 containerColor = MaterialTheme.colorScheme.surface
                                             )
@@ -232,7 +257,10 @@ fun FestivalDetailScreen(
 
                         if (showManagementSections) {
                             item {
-                                Card(modifier = Modifier.fillMaxWidth()) {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(22.dp)
+                                ) {
                                     Column(modifier = Modifier.padding(16.dp)) {
                                         Text("Stock matériel", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -249,7 +277,13 @@ fun FestivalDetailScreen(
                                     Text("Zones tarifaires", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                                 }
                                 items(festival.tariffZones) { zone ->
-                                    Card(modifier = Modifier.fillMaxWidth()) {
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(18.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.surface
+                                        )
+                                    ) {
                                         Column(modifier = Modifier.padding(12.dp)) {
                                             Text(zone.name, fontWeight = FontWeight.SemiBold)
                                             Spacer(modifier = Modifier.height(4.dp))
@@ -274,7 +308,8 @@ fun FestivalDetailScreen(
                                     onClick = { onViewReservations(festival.id) },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(50.dp)
+                                        .height(52.dp),
+                                    shape = RoundedCornerShape(18.dp)
                                 ) {
                                     Text("Voir les réservations")
                                 }
@@ -285,7 +320,8 @@ fun FestivalDetailScreen(
                                         onClick = { onViewCrm(festival.id) },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(50.dp)
+                                            .height(52.dp),
+                                        shape = RoundedCornerShape(18.dp)
                                     ) {
                                         Text("Suivi CRM")
                                     }
@@ -297,7 +333,8 @@ fun FestivalDetailScreen(
                                     onClick = onBack,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(50.dp)
+                                        .height(52.dp),
+                                    shape = RoundedCornerShape(18.dp)
                                 ) {
                                     Text("Retour au catalogue")
                                 }
@@ -312,9 +349,15 @@ fun FestivalDetailScreen(
 
 @Composable
 private fun SectionCard(title: String, content: @Composable () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)
+        )
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(title, style = MaterialTheme.typography.titleLarge)
             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
             content()
         }
@@ -327,6 +370,7 @@ private fun GameGuestCard(game: Jeu) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 12.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
